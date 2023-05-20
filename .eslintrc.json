@@ -1,3 +1,4 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
+  "plugins": ["import", "simple-import-sort", "@typescript-eslint", "unicorn"]
 }
