@@ -19,7 +19,7 @@ export function SideNav() {
       {navigation.map((section) => (
         <ul key={section.name} className="menu menu-compact px-4">
           <li className="menu-title">
-            <span>Actions</span>
+            <span>{section.name}</span>
           </li>
           {section.items.map((item) => (
             <li key={item.name}>
