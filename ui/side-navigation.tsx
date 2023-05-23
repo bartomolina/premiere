@@ -16,20 +16,18 @@ export function SideNav() {
         </Link>
       </div>
       <div className="h-4" />
-      <ul className="menu menu-compact px-2">
-        {navigation.map((section) => (
-          <>
-            <li className="menu-title">
-              <span>Actions</span>
+      {navigation.map((section) => (
+        <ul key={section.name} className="menu menu-compact px-4">
+          <li className="menu-title">
+            <span>Actions</span>
+          </li>
+          {section.items.map((item) => (
+            <li key={item.name}>
+              <GlobalNavItem key={item.slug} item={item} />
             </li>
-            {section.items.map((item) => (
-              <li>
-                <GlobalNavItem key={item.slug} item={item} />
-              </li>
-            ))}
-          </>
-        ))}
-      </ul>
+          ))}
+        </ul>
+      ))}
     </aside>
   );
 }
