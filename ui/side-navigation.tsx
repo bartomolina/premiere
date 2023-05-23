@@ -1,6 +1,11 @@
-import Link from "next/link";
+"use client";
 
-const SideNav = () => {
+import Link from "next/link";
+import { navigation, type NavItem } from "@/lib/navigation";
+import { useSelectedLayoutSegment } from "next/navigation";
+import clsx from "clsx";
+
+export function SideNav() {
   return (
     <aside className="w-80 bg-base-200">
       <div className="flex items-center gap-2 px-4 py-2">
@@ -11,19 +16,36 @@ const SideNav = () => {
         </Link>
       </div>
       <div className="h-4" />
-      <ul className="menu px-2">
-        <li className="menu-title">
-          <span>Actions</span>
-        </li>
-        <li>
-          <Link href={"/"}>One</Link>
-        </li>
-        <li>
-          <Link href={"/"}>Two</Link>
-        </li>
+      <ul className="menu menu-compact px-2">
+        {navigation.map((section) => (
+          <>
+            <li className="menu-title">
+              <span>Actions</span>
+            </li>
+            {section.items.map((item) => (
+              <li>
+                <GlobalNavItem key={item.slug} item={item} />
+              </li>
+            ))}
+          </>
+        ))}
       </ul>
     </aside>
   );
-};
+}
 
-export default SideNav;
+function GlobalNavItem({ item }: { item: NavItem }) {
+  const segment = useSelectedLayoutSegment();
+  const isActive = item.slug === segment;
+
+  return (
+    <Link
+      href={`/${item.slug}`}
+      className={clsx({
+        active: isActive,
+      })}
+    >
+      {item.name}
+    </Link>
+  );
+}

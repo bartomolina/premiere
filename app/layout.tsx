@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { SideNav } from "@/ui/side-navigation";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,7 +16,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="drawer-mobile drawer bg-base-100">
+          <input id="drawer" type="checkbox" className="drawer-toggle" />
+          <div className="drawer-content">
+            <div
+              className="sticky top-0 z-30 flex h-16 w-full justify-center bg-base-100 bg-opacity-90 text-base-content backdrop-blur 
+  transition-all duration-100"
+            >
+              <nav className="navbar w-full">
+                <div className="flex flex-1 md:gap-1 lg:gap-2">Nav left</div>
+                <div className="flex-0">Nav right</div>
+              </nav>
+            </div>
+            <div className="px-6 pb-16 xl:pr-2">{children}</div>
+          </div>
+          <div className="drawer-side">
+            <label htmlFor="drawer" className="drawer-overlay" />
+            <SideNav />
+          </div>
+        </div>
+      </body>
     </html>
   );
 }
