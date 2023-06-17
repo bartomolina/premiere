@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { navigation, type NavItem } from "@/lib/navigation";
-import { useSelectedLayoutSegment } from "next/navigation";
 import clsx from "clsx";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
+
+import { navigation, type NavItem } from "@/lib/navigation";
 
 export function SideNav() {
   return (

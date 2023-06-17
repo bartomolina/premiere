@@ -1,6 +1,6 @@
 import { Bars3Icon } from "@heroicons/react/24/solid";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 export function TopNavigation() {
   return (
