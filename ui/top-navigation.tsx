@@ -1,4 +1,4 @@
-import { Bars3Icon } from "@heroicons/react/24/solid";
+import { List } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ export function TopNavigation() {
             htmlFor="drawer"
             className="btn-ghost drawer-button btn-square btn lg:hidden"
           >
-            <Bars3Icon className="h-6 w-6" />
+            <List size={25} />
           </label>
           Top nav
         </div>
