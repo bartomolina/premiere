@@ -1,6 +1,6 @@
-import { Sun, Moon } from "@phosphor-icons/react";
-import { useState, useEffect } from "react";
+import { Moon, Sun } from "@phosphor-icons/react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeChanger() {
   const [mounted, setMounted] = useState(false);
@@ -11,12 +11,12 @@ export function ThemeChanger() {
   }, []);
 
   if (!mounted) {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
 
   return (
     <div className="flex gap-4">
-      The current theme is: {theme}
       <label className="swap swap-rotate">
         <input type="checkbox" />
         <Sun

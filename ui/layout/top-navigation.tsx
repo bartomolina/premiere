@@ -1,11 +1,11 @@
 import { List } from "@phosphor-icons/react";
 import Image from "next/image";
-import Link from "next/link";
+import { ThemeChanger } from "@/ui/layout/theme-changer";
 
 export function TopNavigation() {
   return (
     <div
-      className="sticky top-0 z-30 flex h-16 w-full justify-center bg-base-100 bg-opacity-90 text-base-content backdrop-blur 
+      className="sticky top-0 flex h-16 w-full justify-center bg-base-100/90 text-base-content backdrop-blur 
   transition-all duration-100"
     >
       <nav className="navbar w-full">
@@ -27,6 +27,7 @@ export function TopNavigation() {
           >
             <Image src={"/github.svg"} alt="GitHub" width={20} height={20} />
           </a>
+          <ThemeChanger />
         </div>
       </nav>
     </div>

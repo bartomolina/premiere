@@ -6,11 +6,28 @@ export type NavItem = {
 
 export const navigation: { name: string; items: NavItem[] }[] = [
   {
-    name: 'General',
+    name: "General",
     items: [
       {
-        name: 'Get Items',
-        slug: 'items',
+        name: "Get Items",
+        slug: "items",
+      },
+      {
+        name: "Submenu 2",
+        slug: "",
+      },
+      {
+        name: "Submenu 3",
+        slug: "",
+      },
+    ],
+  },
+  {
+    name: "Section 2",
+    items: [
+      {
+        name: "Submenu 1",
+        slug: "",
       },
     ],
   },
