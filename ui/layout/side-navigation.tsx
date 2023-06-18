@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import Link from "next/link";
+import { Logo } from "./logo";
 import { useSelectedLayoutSegment } from "next/navigation";
 
 import { navigation, type NavItem } from "@/lib/navigation";
@@ -8,16 +9,8 @@ import { navigation, type NavItem } from "@/lib/navigation";
 export function SideNav() {
   return (
     <aside className="w-72 bg-base-200 h-full">
-      <div className="p-6">
-        <Link href={"/"}>
-          <div className="flex text-2xl gap-1">
-            ⬛️
-            <div>
-              <span className="font-bold text-primary">App</span>
-              <span className="font-normal text-base-content">Boilerplate</span>
-            </div>
-          </div>
-        </Link>
+      <div className="flex h-20 px-6 items-center">
+        <Logo />
       </div>
       {navigation.map((section) => (
         <ul key={section.name} className="menu px-0">
@@ -41,8 +34,8 @@ function GlobalNavItem({ item }: { item: NavItem }) {
     <Link
       href={`/${item.slug}`}
       className={twMerge(
+        "rounded-none",
         clsx({
-          "rounded-none": true,
           "font-semibold": isActive,
         })
       )}

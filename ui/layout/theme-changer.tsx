@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export function ThemeChanger() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);

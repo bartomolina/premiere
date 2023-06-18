@@ -27,7 +27,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
-          <Client>{children}</Client>
+          <Client dashboard={false}>{children}</Client>
         </Providers>
       </body>
     </html>
