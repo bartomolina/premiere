@@ -1,77 +1,63 @@
-import { List } from "@phosphor-icons/react";
-import { ThemeChanger } from "@/ui/layout/theme-changer";
-import { Logo } from "./logo";
-import { GithubLogo } from "@phosphor-icons/react";
+import { GithubLogo, List } from "@phosphor-icons/react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
-import { navigation, type NavItem } from "@/lib/navigation";
-import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
+
+import { navigation } from "@/lib/navigation";
+import { ThemeChanger } from "@/ui/layout/theme-changer";
+
+import { LensLogin } from "./lens-login";
+import { Logo } from "./logo";
+import { NavItem } from "./nav-item";
+import {
+  production,
+  type LensConfig,
+  development,
+} from "@lens-protocol/react-web";
 
 export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
   return (
-    <div className="flex h-20 px-6 justify-center">
-      <nav className="navbar p-0">
-        <div className="flex flex-1 gap-2">
-          <label
-            htmlFor="drawer"
-            className="btn-ghost btn-square btn drawer-button lg:hidden"
-          >
-            <List size={25} />
-          </label>
-          <div
-            className={twMerge(
-              clsx({
-                "lg:hidden": dashboard,
-              })
-            )}
-          >
-            <Logo />
-          </div>
+    <div className="flex h-24 items-center p-0">
+      <div className="flex-1 gap-2">
+        <label
+          htmlFor="drawer"
+          className="btn-ghost drawer-button btn-square btn lg:hidden"
+        >
+          <List size={25} />
+        </label>
+        <div
+          className={twMerge(
+            clsx({
+              "lg:hidden": dashboard,
+            })
+          )}
+        >
+          <Logo />
         </div>
-        {!dashboard && (
-          <div className="navbar ml-5">
-            {navigation.map((section) => (
-              <ul key={section.name} className="menu menu-horizontal gap-5">
-                {section.items.map((item) => (
-                  <li key={item.name}>
-                    <GlobalNavItem key={item.slug} item={item} />
-                  </li>
-                ))}
-              </ul>
-            ))}
-          </div>
-        )}
-        <div className="gap-2">
-          <a
-            href="https://www.github.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <GithubLogo size={25} alt="GitHub" />
-          </a>
-          <ThemeChanger />
-        </div>
-      </nav>
-    </div>
-  );
-}
-
-function GlobalNavItem({ item }: { item: NavItem }) {
-  const segment = useSelectedLayoutSegment();
-  const isActive = item.slug === segment;
-
-  return (
-    <Link
-      href={`/${item.slug}`}
-      className={twMerge(
-        "rounded-none hover:bg-inherit px-0 py-2",
-        clsx({
-          "font-semibold border-b-2 border-primary": isActive,
-        })
+      </div>
+      {!dashboard && (
+        <nav className="navbar pl-8">
+          {navigation.map((section) => (
+            <ul key={section.name} className="menu menu-horizontal gap-5">
+              {section.items.map((item) => (
+                <li key={item.name}>
+                  <NavItem key={item.slug} item={item} />
+                </li>
+              ))}
+            </ul>
+          ))}
+        </nav>
       )}
-    >
-      {item.name}
-    </Link>
+      <div className="flex items-center gap-4">
+        <a
+          href="https://www.github.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <GithubLogo size={25} alt="GitHub" />
+        </a>
+        <ThemeChanger />
+        <LensLogin />
+      </div>
+    </div>
   );
 }

@@ -1,9 +1,16 @@
 "use client";
 
+import { LensProvider } from "@lens-protocol/react-web";
+import clsx from "clsx";
+import { useTheme } from "next-themes";
+import { ToastContainer } from "react-toastify";
+import { twMerge } from "tailwind-merge";
+import { WagmiConfig } from "wagmi";
+
+import { lensConfig } from "@/lib/lens-config";
+import { wagmiClient } from "@/lib/wagmi-client";
 import { SideNav } from "@/ui/layout/side-navigation";
 import { TopNavigation } from "@/ui/layout/top-navigation";
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
 
 export function Client({
   children,
@@ -12,6 +19,8 @@ export function Client({
   children: React.ReactNode;
   dashboard?: boolean;
 }) {
+  const { theme } = useTheme();
+
   return (
     <div
       className={twMerge(
@@ -30,14 +39,27 @@ export function Client({
       >
         <input id="drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          <TopNavigation dashboard={dashboard} />
-          <div className="px-6">{children}</div>
+          <WagmiConfig client={wagmiClient}>
+            <LensProvider config={lensConfig}>
+              <div
+                className={twMerge(
+                  clsx({
+                    "px-6": dashboard,
+                  })
+                )}
+              >
+                <TopNavigation dashboard={dashboard} />
+                <div className="py-6">{children}</div>
+              </div>
+            </LensProvider>
+          </WagmiConfig>
         </div>
         <div className="drawer-side">
           <label htmlFor="drawer" className="drawer-overlay" />
           <SideNav />
         </div>
       </div>
+      <ToastContainer theme={theme === "light" ? "light" : "dark"} />
     </div>
   );
 }

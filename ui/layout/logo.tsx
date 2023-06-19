@@ -3,7 +3,7 @@ import Link from "next/link";
 export function Logo() {
   return (
     <Link href={"/"}>
-      <div className="flex text-2xl gap-1">
+      <div className="flex gap-1 text-2xl">
         ⬛️
         <div>
           <span className="font-bold text-primary">App</span>

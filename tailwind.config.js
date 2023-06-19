@@ -4,6 +4,8 @@ module.exports = {
   future: {
     hoverOnlyWhenSupported: true,
   },
-  darkMode: "class",
+  daisyui: {
+    themes: ["lemonade", "dracula"],
+  },
   plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };
