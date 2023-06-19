@@ -1,6 +1,6 @@
-export const truncateAddr = (address: string, separator: string = "…") => {
+export const truncateAddr = (address: string, separator = "…") => {
   const match = address.match(
-    /^(0x[a-zA-Z0-9]{4})[a-zA-Z0-9]+([a-zA-Z0-9]{4})$/
+    /^(0x[\dA-Za-z]{4})[\dA-Za-z]+([\dA-Za-z]{4})$/
   );
 
   if (!match) return address;

@@ -8,11 +8,6 @@ import { ThemeChanger } from "@/ui/layout/theme-changer";
 import { LensLogin } from "./lens-login";
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
-import {
-  production,
-  type LensConfig,
-  development,
-} from "@lens-protocol/react-web";
 
 export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
   return (
