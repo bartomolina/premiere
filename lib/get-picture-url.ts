@@ -1,13 +1,9 @@
-import { type ProfileOwnedByMe } from "@lens-protocol/react-web";
+import { type MediaSet, type ProfileOwnedByMe } from "@lens-protocol/react-web";
 
 export const getPictureURL = (profile: ProfileOwnedByMe) => {
   let picture = "/avatar.png";
-  const profilePicture = profile.picture;
-  if (
-    profile.picture &&
-    profilePicture.original &&
-    profilePicture.original.url
-  ) {
+  const profilePicture = profile.picture as MediaSet;
+  if (profilePicture.original && profilePicture.original.url) {
     if (profilePicture.original.url.startsWith("ipfs://")) {
       const result = profilePicture.original.url.slice(
         7,

@@ -4,14 +4,16 @@ import {
   useWalletLogin,
   useWalletLogout,
 } from "@lens-protocol/react-web";
+import Image from "next/image";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { LensProfiles } from "./lens-profiles";
+
 import { getPictureURL } from "@/lib/get-picture-url";
-import Image from "next/image";
 import { truncateAddr } from "@/lib/truncate-address";
+
+import { LensProfiles } from "./lens-profiles";
 
 export function LensLogin() {
   const {
@@ -19,7 +21,7 @@ export function LensLogin() {
     error: loginError,
     isPending: isLoginPending,
   } = useWalletLogin();
-  const { execute: logout, isPending: isLogoutPending } = useWalletLogout();
+  const { execute: logout } = useWalletLogout();
   const { data: wallet } = useActiveWallet();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({
@@ -52,15 +54,15 @@ export function LensLogin() {
           <div className="dropdown">
             <label
               tabIndex={0}
-              className="flex btn-sm btn btn-primary normal-case flex-nowrap"
+              className="btn-primary btn-sm btn flex flex-nowrap normal-case"
             >
-              <div className="w-5 h-5 relative">
+              <div className="relative h-5 w-5">
                 <Image
                   src={getPictureURL(activeProfile)}
                   alt={activeProfile.handle}
                   fill
                   sizes="(max-width: 20px) 100vw"
-                  className="object-cover rounded-full"
+                  className="rounded-full object-cover"
                 />
               </div>
               {activeProfile?.handle}
@@ -79,7 +81,7 @@ export function LensLogin() {
           <div className="dropdown">
             <label
               tabIndex={0}
-              className="flex btn-sm btn btn-primary normal-case flex-nowrap whitespace-nowrap"
+              className="btn-primary btn-sm btn flex flex-nowrap whitespace-nowrap normal-case"
             >
               {truncateAddr(wallet.address)}
             </label>

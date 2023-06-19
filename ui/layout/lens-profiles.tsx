@@ -4,9 +4,10 @@ import {
   useActiveProfileSwitch,
   useProfilesOwnedByMe,
 } from "@lens-protocol/react-web";
+import Image from "next/image";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import Image from "next/image";
+
 import { getPictureURL } from "@/lib/get-picture-url";
 
 export function LensProfiles() {
@@ -34,13 +35,13 @@ export function LensProfiles() {
           .map((profile) => (
             <li key={profile.id}>
               <a onClick={() => setActiveProfile(profile.id)}>
-                <div className="w-5 h-5 relative">
+                <div className="relative h-5 w-5">
                   <Image
                     src={getPictureURL(profile)}
                     alt={profile.handle}
                     fill
                     sizes="(max-width: 20px) 100vw"
-                    className="object-cover rounded-full"
+                    className="rounded-full object-cover"
                   />
                 </div>
                 {profile.handle}
