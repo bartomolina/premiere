@@ -2,8 +2,8 @@ import { useSearchProfiles } from "@lens-protocol/react-web";
 import Image from "next/image";
 import Link from "next/link";
 
-import { HANDLE_SUFFIX } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
+import { getProfileName } from "@/lib/get-profile-info";
 
 export function ProfileSearchSuggestions({
   query,
@@ -51,7 +51,7 @@ export function ProfileSearchSuggestions({
             </div>
             <div>
               <p className="font-semibold text-primary">
-                {profile.name ?? profile.handle.replace(HANDLE_SUFFIX, "")}
+                {getProfileName(profile)}
               </p>
               <p>{profile.handle}</p>
             </div>

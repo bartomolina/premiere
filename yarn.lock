@@ -1294,6 +1294,11 @@
     "@tanstack/query-core" "4.29.14"
     use-sync-external-store "^1.2.0"
 
+"@tokenbound/sdk-ethers@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@tokenbound/sdk-ethers/-/sdk-ethers-0.2.0.tgz#9c73175dfbbfa98dba457645aef9040da1612cf0"
+  integrity sha512-1DNKpd5bEH6IHMyjZMNW7jqeVz7YtO8oxOc9Dszdu3aiPdjgQqhrABMdlpOs3K6wE4IStRx8rYi459gfWEfQQg==
+
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@tsconfig/node10/-/node10-1.0.9.tgz#df4907fc07a886922637b15e02d4cebc4c0021b2"

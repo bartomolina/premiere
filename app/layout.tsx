@@ -26,7 +26,7 @@ export default function RootLayout({
         <Providers>
           <Client dashboard={false}>
             <ProfileSearch />
-            <div className="py-5">{children}</div>
+            <div className="py-10">{children}</div>
           </Client>
         </Providers>
       </body>

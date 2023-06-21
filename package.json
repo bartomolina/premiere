@@ -12,6 +12,7 @@
     "@lens-protocol/react-web": "^1.1.1",
     "@lens-protocol/wagmi": "^1.1.1",
     "@phosphor-icons/react": "^2.0.10",
+    "@tokenbound/sdk-ethers": "^0.2.0",
     "@types/node": "20.2.1",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
