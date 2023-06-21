@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 
-import { getPictureURL } from "@/lib/get-picture-url";
+import { getAvatar } from "@/lib/get-avatar";
 
 export function LensProfiles() {
   const { data: activeProfile } = useActiveProfile();
@@ -37,7 +37,7 @@ export function LensProfiles() {
               <a onClick={() => setActiveProfile(profile.id)}>
                 <div className="relative h-5 w-5">
                   <Image
-                    src={getPictureURL(profile)}
+                    src={getAvatar(profile)}
                     alt={profile.handle}
                     fill
                     sizes="(max-width: 20px) 100vw"

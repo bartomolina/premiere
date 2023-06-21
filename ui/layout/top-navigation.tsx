@@ -12,10 +12,10 @@ import { NavItem } from "./nav-item";
 export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
   return (
     <div className="flex h-24 items-center p-0">
-      <div className="flex-1 gap-2">
+      <div className="flex items-center gap-2">
         <label
           htmlFor="drawer"
-          className="btn-ghost drawer-button btn-square btn lg:hidden"
+          className="btn-ghost drawer-button btn-square btn hidden"
         >
           <List size={25} />
         </label>
@@ -44,7 +44,7 @@ export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
       )}
       <div className="flex items-center gap-4">
         <a
-          href="https://www.github.com/"
+          href="https://github.com/bartomolina/m0saic"
           target="_blank"
           rel="noopener noreferrer"
         >

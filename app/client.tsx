@@ -43,13 +43,14 @@ export function Client({
             <LensProvider config={lensConfig}>
               <div
                 className={twMerge(
+                  "lg:px-0 px-3",
                   clsx({
                     "px-6": dashboard,
                   })
                 )}
               >
                 <TopNavigation dashboard={dashboard} />
-                <div className="py-6">{children}</div>
+                <div className="md: py-5">{children}</div>
               </div>
             </LensProvider>
           </WagmiConfig>

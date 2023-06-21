@@ -8,24 +8,12 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "lens.infura-ipfs.io",
+        protocol: "http",
+        hostname: "*",
       },
       {
         protocol: "https",
-        hostname: "*.amazonaws.com",
-      },
-      {
-        protocol: "https",
-        hostname: "cdnjs.cloudflare.com",
-      },
-      {
-        protocol: "https",
-        hostname: "ik.imagekit.io",
-      },
-      {
-        protocol: "https",
-        hostname: "cdn.stamp.fyi",
+        hostname: "*",
       },
     ],
   },

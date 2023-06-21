@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
-import { getPictureURL } from "@/lib/get-picture-url";
+import { getAvatar } from "@/lib/get-avatar";
 import { truncateAddr } from "@/lib/truncate-address";
 
 import { LensProfiles } from "./lens-profiles";
@@ -50,52 +50,38 @@ export function LensLogin() {
   return (
     <>
       {wallet ? (
-        activeProfile ? (
-          <div className="dropdown">
-            <label
-              tabIndex={0}
-              className="btn-primary btn-sm btn flex flex-nowrap normal-case"
-            >
-              <div className="relative h-5 w-5">
-                <Image
-                  src={getPictureURL(activeProfile)}
-                  alt={activeProfile.handle}
-                  fill
-                  sizes="(max-width: 20px) 100vw"
-                  className="rounded-full object-cover"
-                />
-              </div>
-              {activeProfile?.handle}
-            </label>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
-            >
-              <LensProfiles />
-              <li>
-                <a onClick={logout}>Log out</a>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div className="dropdown">
-            <label
-              tabIndex={0}
-              className="btn-primary btn-sm btn flex flex-nowrap whitespace-nowrap normal-case"
-            >
-              {truncateAddr(wallet.address)}
-            </label>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu rounded-box w-52 bg-base-100 p-2 shadow"
-            >
-              <LensProfiles />
-              <li>
-                <a onClick={logout}>Log out</a>
-              </li>
-            </ul>
-          </div>
-        )
+        <div className="dropdown">
+          <label
+            tabIndex={0}
+            className="btn-primary btn-sm btn flex flex-nowrap whitespace-nowrap normal-case"
+          >
+            {activeProfile ? (
+              <>
+                <div className="relative h-5 w-5">
+                  <Image
+                    src={getAvatar(activeProfile)}
+                    alt={activeProfile.handle}
+                    fill
+                    sizes="(max-width: 20px) 100vw"
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                {activeProfile?.handle}
+              </>
+            ) : (
+              <>{truncateAddr(wallet.address)}</>
+            )}
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu rounded-box z-10 w-52 bg-base-100 p-2 shadow"
+          >
+            <LensProfiles />
+            <li>
+              <a onClick={logout}>Log out</a>
+            </li>
+          </ul>
+        </div>
       ) : (
         <button
           className="btn-primary btn-sm btn whitespace-nowrap normal-case"
