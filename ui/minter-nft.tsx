@@ -76,9 +76,9 @@ export function MinterNFT({
     }
   }, [isPrepareError, isError, prepareError, error]);
 
-  console.log("isLoading: ", isLoading);
-  console.log("write: ", write);
-  console.log("data: ", data);
+  console.log("isLoading:", isLoading);
+  console.log("write:", write);
+  console.log("data:", data);
 
   return (
     <>
