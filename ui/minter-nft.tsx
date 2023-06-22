@@ -79,17 +79,17 @@ export function MinterNFT({
   console.log("isLoading:", isLoading);
   console.log("write:", write);
   console.log("data:", data);
+  console.log("data:", tba);
+  console.log("data:", tokenId);
+  console.log("addr:", MOSAIC_NFT_MINTER_ADDRESS);
 
   return (
-    <>
-      <div>{isLoading}</div>
-      <button
-        disabled={!write || isLoading}
-        onClick={() => write?.()}
-        className="btn-primary btn-sm btn mt-5 normal-case"
-      >
-        Milady
-      </button>
-    </>
+    <button
+      disabled={!write || isLoading}
+      onClick={() => write?.()}
+      className="btn-primary btn-sm btn mt-5 normal-case"
+    >
+      Milady
+    </button>
   );
 }
