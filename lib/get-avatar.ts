@@ -53,7 +53,7 @@ export function getAvatar(profile: Profile, namedTransform = AVATAR): string {
     }
   }
 
-  if (!avatarUrl?.length) {
+  if (!avatarUrl) {
     avatarUrl = getStampFyiURL(profile?.ownedBy ?? ZERO_ADDRESS);
   }
 

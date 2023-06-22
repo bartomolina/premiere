@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 import { navigation } from "@/lib/navigation";
 import { ThemeChanger } from "@/ui/layout/theme-changer";
 
-import { LensLogin } from "./lens-login";
+// import { LensLogin } from "./lens-login";
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
 
@@ -51,7 +51,7 @@ export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
           <GithubLogo size={25} alt="GitHub" />
         </a>
         <ThemeChanger />
-        <LensLogin />
+        {/* <LensLogin /> */}
       </div>
     </div>
   );

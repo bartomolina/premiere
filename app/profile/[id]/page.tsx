@@ -5,14 +5,14 @@ import { getAccount } from "@tokenbound/sdk-ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProvider } from "wagmi";
 
-import { LENS_PROFILES_ADDRESS } from "@/lib/constants";
+import { LENS_PROFILES_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
 import { Assets } from "@/ui/assets";
 import { CreateTba } from "@/ui/create-tba";
 import { ProfileDetails } from "@/ui/profile-details";
 import { TbaDetails } from "@/ui/tba-details";
 
 export default function Page({ params }: { params: { id: ProfileId } }) {
-  const [tba, setTba] = useState("");
+  const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
   const [tbaDeployed, setTbaDeployed] = useState(true);
   const { data: profile, loading: profileLoading } = useProfile({
     profileId: params.id,
@@ -58,8 +58,9 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
       <ProfileDetails profile={profile} />
       <div className="col-span-4">
         <div className="flex">
-          <TbaDetails profile={profile} tba={tba} tbaDeployed={tbaDeployed} />
-
+          {tba && (
+            <TbaDetails profile={profile} tba={tba} tbaDeployed={tbaDeployed} />
+          )}
           <div className="flex w-full justify-end">
             <CreateTba
               disabled={tbaDeployed}
@@ -69,7 +70,7 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
           </div>
         </div>
         <div className="mt-5">
-          <Assets />
+          {tba !== ZERO_ADDRESS && <Assets tba={tba} />}
         </div>
       </div>
     </div>
