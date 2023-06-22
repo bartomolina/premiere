@@ -1,3 +1,4 @@
+import { useActiveWallet } from "@lens-protocol/react-web";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
@@ -48,6 +49,7 @@ export function MinterNFT({
   });
   const { data, error, isError, write } = useContractWrite(config);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: wallet } = useActiveWallet();
 
   useEffect(() => {
     if (data) {
@@ -76,20 +78,13 @@ export function MinterNFT({
     }
   }, [isPrepareError, isError, prepareError, error]);
 
-  console.log("isLoading:", isLoading);
-  console.log("write:", write);
-  console.log("data:", data);
-  console.log("data:", tba);
-  console.log("data:", tokenId);
-  console.log("addr:", MOSAIC_NFT_MINTER_ADDRESS);
-
   return (
     <button
       disabled={!write || isLoading}
       onClick={() => write?.()}
       className="btn-primary btn-sm btn mt-5 normal-case"
     >
-      Milady
+      {wallet ? "Milady" : "Connect account"}
     </button>
   );
 }

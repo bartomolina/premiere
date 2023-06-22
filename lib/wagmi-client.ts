@@ -2,9 +2,10 @@ import { configureChains, createClient } from "wagmi";
 import { polygon, polygonMumbai } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 
-import { ALCHEMY_API_KEY } from "./constants";
+import { ALCHEMY_API_KEY, LENS_NETWORK } from "./constants";
+
 const { provider, webSocketProvider } = configureChains(
-  [polygon, polygonMumbai],
+  [LENS_NETWORK === "mainnet" ? polygon : polygonMumbai],
   [alchemyProvider({ apiKey: ALCHEMY_API_KEY })]
 );
 

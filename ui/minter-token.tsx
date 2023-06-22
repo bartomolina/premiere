@@ -1,3 +1,4 @@
+import { useActiveWallet } from "@lens-protocol/react-web";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -43,6 +44,7 @@ export function MinterToken({
   });
   const { data, error, isError, write } = useContractWrite(config);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: wallet } = useActiveWallet();
 
   useEffect(() => {
     if (data) {
@@ -74,7 +76,7 @@ export function MinterToken({
       onClick={() => write?.()}
       className="btn-primary btn-sm btn mt-5 normal-case"
     >
-      MSK
+      {wallet ? "MSK" : "Connect account"}
     </button>
   );
 }
