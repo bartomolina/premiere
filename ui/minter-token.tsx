@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 
 import { MOSAIC_TOKEN_MINTER_ADDRESS } from "@/lib/constants";
+import { wagmiNetwork } from "@/lib/wagmi-client";
 
 export function MinterToken({
   tba,
@@ -41,6 +42,7 @@ export function MinterToken({
     ],
     functionName: "mint",
     args: [tba, ethers.utils.parseEther("1000")],
+    chainId: wagmiNetwork.id,
   });
   const { data, error, isError, write } = useContractWrite(config);
   const [isLoading, setIsLoading] = useState(false);

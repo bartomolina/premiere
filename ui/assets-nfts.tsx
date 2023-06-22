@@ -2,7 +2,7 @@ import { Alchemy, type OwnedNft, type OwnedNftsResponse } from "alchemy-sdk";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
-import { ALCHEMY_API_KEY, ALCHEMY_NETWORK } from "@/lib/constants";
+import { ALCHEMY_API_KEY, ALCHEMY_NETWORK, OPENSEA_URL } from "@/lib/constants";
 
 import { MinterNFT } from "./minter-nft";
 
@@ -31,17 +31,26 @@ export function AssetsNfts({ tba }: { tba: `0x${string}` }) {
   return (
     <div className="text-center">
       {nfts.length > 0 ? (
-        <div className="flex flex-wrap items-center justify-center gap-7">
+        <div className="flex flex-wrap items-center justify-center gap-5">
           {nfts
             .filter((nft) => nft.media[0]?.thumbnail || nft.media[0]?.gateway)
             .map((nft) => (
               <div key={`${nft.contract?.address}${nft.tokenId}`}>
-                <Image
-                  alt={nft.title ?? nft.tokenId}
-                  src={nft.media[0]?.thumbnail || nft.media[0]?.gateway}
-                  width={150}
-                  height={150}
-                />
+                <a
+                  href={`${OPENSEA_URL}${nft.contract?.address}/${nft.tokenId}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <div className="relative h-40 w-40">
+                    <Image
+                      alt={nft.title ?? nft.tokenId}
+                      src={nft.media[0]?.thumbnail || nft.media[0]?.gateway}
+                      fill
+                      sizes="160px"
+                      className="object-contain"
+                    />
+                  </div>
+                </a>
               </div>
             ))}
         </div>

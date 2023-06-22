@@ -7,11 +7,18 @@ import {
 import Image from "next/image";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useNetwork,
+  useSwitchNetwork,
+} from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
 import { getAvatar } from "@/lib/get-avatar";
 import { truncateAddr } from "@/lib/truncate-address";
+import { wagmiNetwork } from "@/lib/wagmi-client";
 
 import { LensProfiles } from "./lens-profiles";
 
@@ -29,6 +36,10 @@ export function LensLogin() {
   });
   const { disconnectAsync } = useDisconnect();
   const { data: activeProfile } = useActiveProfile();
+  const { chain } = useNetwork();
+  const { switchNetwork } = useSwitchNetwork({
+    chainId: wagmiNetwork.id,
+  });
 
   const onLoginClick = async () => {
     if (isConnected) {
@@ -46,6 +57,13 @@ export function LensLogin() {
   useEffect(() => {
     loginError && toast.error(loginError.message);
   }, [loginError]);
+
+  useEffect(() => {
+    if (switchNetwork && chain && chain.id !== wagmiNetwork.id) {
+      console.log(chain);
+      switchNetwork();
+    }
+  }, [chain, switchNetwork]);
 
   return (
     <>

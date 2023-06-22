@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite } from "wagmi";
 
 import { MOSAIC_NFT_MINTER_ADDRESS, NFT_ITEMS } from "@/lib/constants";
+import { wagmiNetwork } from "@/lib/wagmi-client";
 
 const generateRandomTokenId = (items: number = NFT_ITEMS): number => {
   return Math.floor(Math.random() * (items - 1 - 1 + 1) + 1);
@@ -46,6 +47,7 @@ export function MinterNFT({
     ],
     functionName: "safeMint",
     args: [tba, `https://www.miladymaker.net/milady/json/${tokenId}`],
+    chainId: wagmiNetwork.id,
   });
   const { data, error, isError, write } = useContractWrite(config);
   const [isLoading, setIsLoading] = useState(false);

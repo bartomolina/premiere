@@ -5,7 +5,7 @@ export function Separator({ title }: { title: string }) {
         <div className="w-full border-t border-gray-300" />
       </div>
       <div className="relative flex justify-start">
-        <span className="bg-gray-50 pr-3 text-base font-semibold leading-6">
+        <span className="bg-base-100 pr-3 text-xl font-semibold leading-6">
           {title}
         </span>
       </div>

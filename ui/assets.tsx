@@ -4,7 +4,7 @@ import { Separator } from "./separator";
 
 export function Assets({ tba }: { tba: `0x${string}` }) {
   return (
-    <div className="rounded-lg bg-gray-50 p-4">
+    <div className="rounded-lg border border-base-200 p-4 shadow">
       <div>
         <Separator title="Streams" />
         <div className="p-5">
