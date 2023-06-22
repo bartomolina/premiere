@@ -74,7 +74,7 @@ export function MinterToken({
 
   return (
     <button
-      disabled={!write || isLoading}
+      disabled={!write || isLoading || !wallet}
       onClick={() => write?.()}
       className="btn-primary btn-sm btn mt-5 normal-case"
     >
