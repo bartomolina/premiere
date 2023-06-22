@@ -60,7 +60,6 @@ export function LensLogin() {
 
   useEffect(() => {
     if (switchNetwork && chain && chain.id !== wagmiNetwork.id) {
-      console.log(chain);
       switchNetwork();
     }
   }, [chain, switchNetwork]);

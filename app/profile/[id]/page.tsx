@@ -70,7 +70,7 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
           </div>
         </div>
         <div className="mt-5">
-          {tba !== ZERO_ADDRESS && <Assets tba={tba} />}
+          {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />}
         </div>
       </div>
     </div>

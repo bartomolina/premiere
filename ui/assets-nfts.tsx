@@ -29,8 +29,11 @@ export function AssetsNfts({ tba }: { tba: `0x${string}` }) {
   }, [fetchNFTs]);
 
   return (
-    <div className="text-center">
-      {nfts.length > 0 ? (
+    <div className="space-y-8">
+      <div className="flex items-center justify-end">
+        <MinterNFT tba={tba} fetchNFTs={fetchNFTs} />
+      </div>
+      {nfts.some((nft) => nft.media[0]?.thumbnail || nft.media[0]?.gateway) ? (
         <div className="flex flex-wrap items-center justify-center gap-5">
           {nfts
             .filter((nft) => nft.media[0]?.thumbnail || nft.media[0]?.gateway)
@@ -57,7 +60,6 @@ export function AssetsNfts({ tba }: { tba: `0x${string}` }) {
       ) : (
         <div className="p-10 text-center font-semibold">Nothing to show</div>
       )}
-      <MinterNFT tba={tba} fetchNFTs={fetchNFTs} />
     </div>
   );
 }

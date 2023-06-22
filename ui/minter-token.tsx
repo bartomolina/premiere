@@ -69,6 +69,7 @@ export function MinterToken({
   useEffect(() => {
     if ((isPrepareError || isError) && (prepareError || error)) {
       toast.error((prepareError || error)?.message);
+      console.error(error);
     }
   }, [isPrepareError, isError, prepareError, error]);
 
@@ -76,9 +77,9 @@ export function MinterToken({
     <button
       disabled={!write || isLoading || !wallet}
       onClick={() => write?.()}
-      className="btn-primary btn-sm btn mt-5 normal-case"
+      className="btn-primary btn-sm btn block normal-case"
     >
-      {wallet ? "MSK" : "Connect account"}
+      {wallet ? "Mint 1,000 MSK" : "Connect account"}
     </button>
   );
 }

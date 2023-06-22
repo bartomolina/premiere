@@ -45,7 +45,7 @@ export function ProfileDetails({ profile }: { profile: Profile }) {
           target="_blank"
           rel="noreferrer noopener"
         >
-          view on OpenSea
+          View on OpenSea
           <ArrowSquareOut />
         </a>
       </div>

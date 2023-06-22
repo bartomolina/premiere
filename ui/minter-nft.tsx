@@ -77,6 +77,7 @@ export function MinterNFT({
   useEffect(() => {
     if ((isPrepareError || isError) && (prepareError || error)) {
       toast.error((prepareError || error)?.message);
+      console.error(error);
     }
   }, [isPrepareError, isError, prepareError, error]);
 
@@ -84,9 +85,9 @@ export function MinterNFT({
     <button
       disabled={!write || isLoading || !wallet}
       onClick={() => write?.()}
-      className="btn-primary btn-sm btn mt-5 normal-case"
+      className="btn-primary btn-sm btn normal-case"
     >
-      {wallet ? "Milady" : "Connect account"}
+      {wallet ? "Mint a Milady" : "Connect account"}
     </button>
   );
 }

@@ -49,11 +49,13 @@ export function AssetsTokens({ tba }: { tba: `0x${string}` }) {
   }, [fetchBalances, tba]);
 
   return (
-    <div className="text-center">
+    <div className="space-y-8">
+      <div className="flex items-center justify-end">
+        <MinterToken tba={tba} fetchBalances={fetchBalances} />
+      </div>
       {tokens.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="table">
-            {/* head */}
             <thead>
               <tr>
                 <th>Symbol</th>
@@ -75,7 +77,6 @@ export function AssetsTokens({ tba }: { tba: `0x${string}` }) {
       ) : (
         <div className="p-10 text-center font-semibold">Nothing to show</div>
       )}
-      <MinterToken tba={tba} fetchBalances={fetchBalances} />
     </div>
   );
 }
