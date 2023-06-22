@@ -76,8 +76,13 @@ export function MinterNFT({
     }
   }, [isPrepareError, isError, prepareError, error]);
 
+  console.log("isLoading: ", isLoading);
+  console.log("write: ", write);
+  console.log("data: ", data);
+
   return (
     <>
+      <div>{isLoading}</div>
       <button
         disabled={!write || isLoading}
         onClick={() => write?.()}

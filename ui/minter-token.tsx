@@ -69,14 +69,12 @@ export function MinterToken({
   }, [isPrepareError, isError, prepareError, error]);
 
   return (
-    <>
-      <button
-        disabled={!write || isLoading}
-        onClick={() => write?.()}
-        className="btn-primary btn-sm btn mt-5 normal-case"
-      >
-        MSK
-      </button>
-    </>
+    <button
+      disabled={!write || isLoading}
+      onClick={() => write?.()}
+      className="btn-primary btn-sm btn mt-5 normal-case"
+    >
+      MSK
+    </button>
   );
 }
