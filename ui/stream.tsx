@@ -23,7 +23,7 @@ export function Stream({ stream, profile }: { stream: any; profile: Profile }) {
     <div className="flex justify-center">
       <div className="text-center text-sm">
         <div className="flex items-center">
-          <div className="rounded border px-10 py-3 shadow">
+          <div className="rounded border px-10 py-3 w-56 shadow">
             {sender && sender.length > 0 ? (
               <div>
                 <Image
@@ -49,7 +49,7 @@ export function Stream({ stream, profile }: { stream: any; profile: Profile }) {
               priority
             />
           </div>
-          <div className="rounded border px-10 py-3 shadow">
+          <div className="rounded border px-10 py-3 w-56 shadow">
             <div>
               <Image
                 src={getAvatar(profile)}
