@@ -2,6 +2,7 @@ import { type Profile, useProfilesOwnedBy } from "@lens-protocol/react-web";
 import { ethers } from "ethers";
 import Image from "next/image";
 
+import { SUPERFLUID_STREAM_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getProfileName } from "@/lib/get-profile-info";
 
@@ -22,8 +23,13 @@ export function Stream({ stream, profile }: { stream: any; profile: Profile }) {
   return (
     <div className="flex justify-center">
       <div className="text-center text-sm">
-        <div className="flex items-center">
-          <div className="rounded border px-10 py-3 w-56 shadow">
+        <a
+          className="flex items-center"
+          href={`${SUPERFLUID_STREAM_URL}${stream.id}`}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          <div className="w-56 rounded border px-10 py-3 shadow">
             {sender && sender.length > 0 ? (
               <div>
                 <Image
@@ -49,7 +55,7 @@ export function Stream({ stream, profile }: { stream: any; profile: Profile }) {
               priority
             />
           </div>
-          <div className="rounded border px-10 py-3 w-56 shadow">
+          <div className="w-56 rounded border px-10 py-3 shadow">
             <div>
               <Image
                 src={getAvatar(profile)}
@@ -62,7 +68,7 @@ export function Stream({ stream, profile }: { stream: any; profile: Profile }) {
               {getProfileName(profile)}
             </div>
           </div>
-        </div>
+        </a>
         <div className="mt-2 font-semibold">
           {flowRate.toFixed(2)} DAI / month
         </div>

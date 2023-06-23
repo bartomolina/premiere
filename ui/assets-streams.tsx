@@ -31,8 +31,6 @@ export function AssetsStreams({
       }
     );
 
-    console.log(pageResult);
-
     if (pageResult && pageResult.data) {
       setStreams(pageResult.data);
     }
