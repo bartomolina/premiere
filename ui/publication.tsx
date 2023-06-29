@@ -19,7 +19,6 @@ export function Publication({ publication }: { publication: Post }) {
     connector: new InjectedConnector(),
   });
 
-  console.log(publication);
   useEffect(() => {
     const decryptPublication = async () => {
       let connector;

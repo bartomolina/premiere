@@ -62,7 +62,7 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
 
   return (
     <div className="grid gap-7 lg:grid-cols-5">
-      <ProfileDetails profile={profile} />
+      <ProfileDetails profile={profile} tba={tba} />
       <div className="col-span-3">
         {/* <div className="flex">
           {tba && (

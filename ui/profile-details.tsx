@@ -5,8 +5,15 @@ import Image from "next/image";
 import { LENS_HUB_ADDRESS, LENSTER_URL, OPENSEA_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
+import { Subscriptions } from "./subscriptions";
 
-export function ProfileDetails({ profile }: { profile: Profile }) {
+export function ProfileDetails({
+  profile,
+  tba,
+}: {
+  profile: Profile;
+  tba: `0x${string}`;
+}) {
   return (
     <div className="space-y-3">
       <Image
@@ -17,6 +24,7 @@ export function ProfileDetails({ profile }: { profile: Profile }) {
         priority
         className="rounded-lg object-cover"
       />
+      <Subscriptions tba={tba} />
       <div>
         <div className="font-semibold text-primary">
           {getProfileName(profile)}
