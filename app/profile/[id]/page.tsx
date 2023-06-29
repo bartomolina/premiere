@@ -9,7 +9,7 @@ import { getAccount } from "@tokenbound/sdk-ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProvider } from "wagmi";
 
-import { LENS_PROFILES_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
+import { LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
 import { Assets } from "@/ui/assets";
 import { CreateTba } from "@/ui/create-tba";
 import { ProfileDetails } from "@/ui/profile-details";
@@ -32,7 +32,7 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
 
   const fetchTBAAddress = useCallback(() => {
     if (provider && tokenId) {
-      getAccount(LENS_PROFILES_ADDRESS, tokenId, provider)
+      getAccount(LENS_HUB_ADDRESS, tokenId, provider)
         .then((address) => {
           setTba(address);
           return provider.getCode(address);
@@ -76,10 +76,12 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
             />
           </div>
         </div> */}
-        {activeProfile && activeProfile.id === profile.id && (
-          <CreatePost publisher={activeProfile} />
-        )}
-        <Publications profileId={profile.id} />
+        <div className="space-y-5">
+          {activeProfile && activeProfile.id === profile.id && (
+            <CreatePost publisher={activeProfile} />
+          )}
+          <Publications profileId={profile.id} />
+        </div>
         <div className="mt-5">
           {/* {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />} */}
         </div>

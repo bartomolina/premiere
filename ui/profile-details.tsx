@@ -2,11 +2,7 @@ import { type Profile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 import Image from "next/image";
 
-import {
-  LENS_PROFILES_ADDRESS,
-  LENSTER_URL,
-  OPENSEA_URL,
-} from "@/lib/constants";
+import { LENS_HUB_ADDRESS, LENSTER_URL, OPENSEA_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 
@@ -38,7 +34,7 @@ export function ProfileDetails({ profile }: { profile: Profile }) {
         </div>
         <a
           className="mt-3 flex items-center gap-1 text-gray-500 hover:underline"
-          href={`${OPENSEA_URL}${LENS_PROFILES_ADDRESS}/${Number.parseInt(
+          href={`${OPENSEA_URL}${LENS_HUB_ADDRESS}/${Number.parseInt(
             profile.id,
             16
           )}`}

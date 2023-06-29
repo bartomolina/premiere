@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
-import { LENS_PROFILES_ADDRESS } from "@/lib/constants";
+import { LENS_HUB_ADDRESS } from "@/lib/constants";
 
 export function CreateTba({
   disabled,
@@ -39,11 +39,7 @@ export function CreateTba({
       if (connector instanceof InjectedConnector) {
         const signer = await connector.getSigner();
         try {
-          const tx = await createAccount(
-            LENS_PROFILES_ADDRESS,
-            tokenId,
-            signer
-          );
+          const tx = await createAccount(LENS_HUB_ADDRESS, tokenId, signer);
           await toast.promise(tx.wait(), {
             pending: "Creating account",
             success: "Account created",
