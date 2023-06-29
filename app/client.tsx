@@ -50,7 +50,7 @@ export function Client({
                 )}
               >
                 <TopNavigation dashboard={dashboard} />
-                <div className="md: py-5">{children}</div>
+                {children}
               </div>
             </LensProvider>
           </WagmiConfig>

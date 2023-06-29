@@ -89,7 +89,7 @@ export function CreateStream({ tba }: { tba: `0x${string}` }) {
         placeholder="Flow rate"
         value={flowRate}
         onChange={(event_) => setFlowRate(event_.target.value)}
-        className="input-bordered input-primary input input-sm w-11 focus:outline-offset-0"
+        className="input-bordered input-primary input input-sm w-11 focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
       />
       DAI / month
       <button

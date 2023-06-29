@@ -3,8 +3,6 @@ import "react-toastify/dist/ReactToastify.min.css";
 
 import { Inter } from "next/font/google";
 
-import { ProfileSearch } from "@/ui/profile-search";
-
 import { Client } from "./client";
 import { Providers } from "./providers";
 
@@ -25,8 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <Client dashboard={false}>
-            <ProfileSearch />
-            <div className="py-10">{children}</div>
+            <div className="py-5">{children}</div>
           </Client>
         </Providers>
       </body>

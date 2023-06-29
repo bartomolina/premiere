@@ -8,6 +8,7 @@ import { ThemeChanger } from "@/ui/layout/theme-changer";
 import { LensLogin } from "./lens-login";
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
+import { ProfileSearch } from "../profile-search";
 
 export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
   return (
@@ -21,12 +22,14 @@ export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
         </label>
         <div
           className={twMerge(
+            "flex items-center gap-5",
             clsx({
               "lg:hidden": dashboard,
             })
           )}
         >
           <Logo />
+          <ProfileSearch />
         </div>
       </div>
       {!dashboard && (

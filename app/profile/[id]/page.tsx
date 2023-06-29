@@ -1,6 +1,10 @@
 "use client";
 
-import { type ProfileId, useProfile } from "@lens-protocol/react-web";
+import {
+  type ProfileId,
+  useProfile,
+  useActiveProfile,
+} from "@lens-protocol/react-web";
 import { getAccount } from "@tokenbound/sdk-ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProvider } from "wagmi";
@@ -10,6 +14,8 @@ import { Assets } from "@/ui/assets";
 import { CreateTba } from "@/ui/create-tba";
 import { ProfileDetails } from "@/ui/profile-details";
 import { TbaDetails } from "@/ui/tba-details";
+import { CreatePost } from "@/ui/create-post";
+import { Publications } from "@/ui/publications";
 
 export default function Page({ params }: { params: { id: ProfileId } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
@@ -17,6 +23,7 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
   const { data: profile, loading: profileLoading } = useProfile({
     profileId: params.id,
   });
+  const { data: activeProfile } = useActiveProfile();
   const provider = useProvider();
 
   const tokenId = useMemo(() => {
@@ -56,8 +63,8 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
   return (
     <div className="grid gap-7 lg:grid-cols-5">
       <ProfileDetails profile={profile} />
-      <div className="col-span-4">
-        <div className="flex">
+      <div className="col-span-3">
+        {/* <div className="flex">
           {tba && (
             <TbaDetails profile={profile} tba={tba} tbaDeployed={tbaDeployed} />
           )}
@@ -68,11 +75,16 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
               accountCreated={accountCreated}
             />
           </div>
-        </div>
+        </div> */}
+        {activeProfile && activeProfile.id === profile.id && (
+          <CreatePost publisher={activeProfile} />
+        )}
+        <Publications profileId={profile.id} />
         <div className="mt-5">
-          {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />}
+          {/* {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />} */}
         </div>
       </div>
+      <div></div>
     </div>
   );
 }
