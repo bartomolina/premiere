@@ -123,9 +123,6 @@ fragment ProfileFields on Profile {
     totalPublications
     totalCollects
   }
-  followModule {
-    ...FollowModuleFields
-  }
 }
 
 fragment PublicationStatsFields on PublicationStats { 
@@ -180,13 +177,6 @@ fragment AccessConditionFields on AccessConditionOutput {
   }
 }
 
-fragment Erc20Fields on Erc20 {
-  name
-  symbol
-  decimals
-  address
-}
-
 fragment PostFields on Post {
   id
   profile {
@@ -199,12 +189,6 @@ fragment PostFields on Post {
     ...MetadataOutputFields
   }
   createdAt
-  collectModule {
-    ...CollectModuleFields
-  }
-  referenceModule {
-    ...ReferenceModuleFields
-  }
   appId
   hidden
   isGated
@@ -216,118 +200,5 @@ fragment PostFields on Post {
   reaction(request: null)
   mirrors(by: null)
   hasCollectedByMe
-}
-
-fragment FollowModuleFields on FollowModule {
-  ... on FeeFollowModuleSettings {
-    type
-    amount {
-      asset {
-        name
-        symbol
-        decimals
-        address
-      }
-      value
-    }
-    recipient
-  }
-  ... on ProfileFollowModuleSettings {
-    type
-    contractAddress
-  }
-  ... on RevertFollowModuleSettings {
-    type
-    contractAddress
-  }
-  ... on UnknownFollowModuleSettings {
-    type
-    contractAddress
-    followModuleReturnData
-  }
-}
-
-fragment CollectModuleFields on CollectModule {
-  __typename
-  ... on FreeCollectModuleSettings {
-    type
-    followerOnly
-    contractAddress
-  }
-  ... on FeeCollectModuleSettings {
-    type
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-  }
-  ... on LimitedFeeCollectModuleSettings {
-    type
-    collectLimit
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-  }
-  ... on LimitedTimedFeeCollectModuleSettings {
-    type
-    collectLimit
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-    endTimestamp
-  }
-  ... on RevertCollectModuleSettings {
-    type
-  }
-  ... on TimedFeeCollectModuleSettings {
-    type
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-    endTimestamp
-  }
-  ... on UnknownCollectModuleSettings {
-    type
-    contractAddress
-    collectModuleReturnData
-  }
-}
-
-fragment ReferenceModuleFields on ReferenceModule {
-  ... on FollowOnlyReferenceModuleSettings {
-    type
-    contractAddress
-  }
-  ... on UnknownReferenceModuleSettings {
-    type
-    contractAddress
-    referenceModuleReturnData
-  }
-  ... on DegreesOfSeparationReferenceModuleSettings {
-    type
-    contractAddress
-    commentsRestricted
-    mirrorsRestricted
-    degreesOfSeparation
-  }
 }
 `;

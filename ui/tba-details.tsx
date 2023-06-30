@@ -2,58 +2,66 @@ import { type Profile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 
 import { POLYGONSCAN_URL } from "@/lib/constants";
+import { truncateAddr } from "@/lib/truncate-address";
+import Image from "next/image";
+import { CreateTba } from "./create-tba";
 
 export function TbaDetails({
   profile,
   tba,
   tbaDeployed,
+  tokenId,
+  accountCreated,
 }: {
   profile: Profile;
   tba: string;
   tbaDeployed: boolean;
+  tokenId: string | undefined;
+  accountCreated: () => void;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="pt-5 text-sm space-y-2">
+      <div className="flex gap-2 items-center">
+        <Image alt="Tokenbound" src={"/tb-mark.svg"} width={35} height={35} />
+        <span className="font-semibold">ERC-6551 TBA</span>
+      </div>
       <div>
-        <label htmlFor="owner" className="text-sm font-semibold">
-          Owned by
+        <label htmlFor="owner" className="font-semibold">
+          Owner
         </label>
         <div id="owner" className="font-mono">
           <a
-            className="mt-1 flex items-center gap-1 text-gray-500 hover:underline"
+            className="flex items-center gap-1 text-gray-500 hover:underline"
             href={`${POLYGONSCAN_URL}address/${profile.ownedBy}`}
             target="_blank"
             rel="noreferrer noopener"
           >
-            {profile.ownedBy}
+            {truncateAddr(profile.ownedBy)}
             <ArrowSquareOut />
           </a>
         </div>
       </div>
       <div>
-        <label htmlFor="tba" className="text-sm font-semibold">
+        <label htmlFor="tba" className="font-semibold">
           Token Bound Account
         </label>
         <div id="tba" className="font-mono">
           <a
-            className="mt-1 flex items-center gap-1 text-gray-500 hover:underline"
+            className="flex items-center gap-1 text-gray-500 hover:underline"
             href={`${POLYGONSCAN_URL}address/${tba}`}
             target="_blank"
             rel="noreferrer noopener"
           >
-            {tba}
+            {truncateAddr(tba)}
             <ArrowSquareOut />
           </a>
         </div>
       </div>
-      <div>
-        <label htmlFor="deployed" className="text-sm font-semibold">
-          Deployed
-        </label>
-        <div id="deployed" className="font-mono">
-          <p className="mt-1 text-gray-500">{tbaDeployed.toString()}</p>
-        </div>
-      </div>
+      <CreateTba
+        tbaDeployed={tbaDeployed}
+        tokenId={tokenId}
+        accountCreated={accountCreated}
+      />
     </div>
   );
 }

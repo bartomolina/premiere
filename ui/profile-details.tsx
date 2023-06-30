@@ -6,13 +6,23 @@ import { LENS_HUB_ADDRESS, LENSTER_URL, OPENSEA_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 import { Subscriptions } from "./subscriptions";
+import { IStream } from "@superfluid-finance/sdk-core";
+import { TbaDetails } from "./tba-details";
 
 export function ProfileDetails({
   profile,
   tba,
+  tbaDeployed,
+  subscriptions,
+  tokenId,
+  accountCreated,
 }: {
   profile: Profile;
   tba: `0x${string}`;
+  tbaDeployed: boolean;
+  subscriptions: IStream[];
+  tokenId: string | undefined;
+  accountCreated: () => void;
 }) {
   return (
     <div className="space-y-3">
@@ -24,7 +34,7 @@ export function ProfileDetails({
         priority
         className="rounded-lg object-cover"
       />
-      <Subscriptions tba={tba} />
+      <Subscriptions tba={tba} subscriptions={subscriptions} />
       <div>
         <div className="font-semibold text-primary">
           {getProfileName(profile)}
@@ -41,7 +51,7 @@ export function ProfileDetails({
           </a>
         </div>
         <a
-          className="mt-3 flex items-center gap-1 text-gray-500 hover:underline"
+          className="flex items-center gap-1 text-gray-500 hover:underline"
           href={`${OPENSEA_URL}${LENS_HUB_ADDRESS}/${Number.parseInt(
             profile.id,
             16
@@ -53,6 +63,13 @@ export function ProfileDetails({
           <ArrowSquareOut />
         </a>
       </div>
+      <TbaDetails
+        profile={profile}
+        tba={tba}
+        tbaDeployed={tbaDeployed}
+        tokenId={tokenId}
+        accountCreated={accountCreated}
+      />
     </div>
   );
 }

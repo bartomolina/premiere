@@ -44,3 +44,9 @@ export const SUPERFLUID_STREAM_URL =
   LENS_NETWORK === "mainnet"
     ? "https://console.superfluid.finance/matic/streams/"
     : "https://console.superfluid.finance/mumbai/streams/";
+export const CHAIN = LENS_NETWORK === "mainnet" ? "polygon" : "mumbai";
+export const MOSAIC_LIT_ACC_CONTRACT =
+  LENS_NETWORK === "mainnet"
+    ? ""
+    : "0xE64d6F5A6A6eaA1456B73eBf62E590e165D8Daac";
+export const APP_ID = "mosaic";

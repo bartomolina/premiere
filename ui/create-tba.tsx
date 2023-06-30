@@ -7,11 +7,11 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { LENS_HUB_ADDRESS } from "@/lib/constants";
 
 export function CreateTba({
-  disabled,
+  tbaDeployed,
   tokenId,
   accountCreated,
 }: {
-  disabled: boolean;
+  tbaDeployed: boolean;
   tokenId: string | undefined;
   accountCreated: () => void;
 }) {
@@ -57,11 +57,11 @@ export function CreateTba({
 
   return (
     <button
-      disabled={disabled || !tokenId || creatingAccount}
+      disabled={tbaDeployed || !tokenId || creatingAccount}
       onClick={deployTBA}
-      className="btn-secondary btn-sm btn normal-case"
+      className="btn-primary btn-sm btn w-full normal-case"
     >
-      Create account
+      {tbaDeployed ? "Already deployed" : "Deploy account"}
     </button>
   );
 }

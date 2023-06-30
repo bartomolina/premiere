@@ -16,9 +16,13 @@ import { ProfileDetails } from "@/ui/profile-details";
 import { TbaDetails } from "@/ui/tba-details";
 import { CreatePost } from "@/ui/create-post";
 import { Publications } from "@/ui/publications";
+import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
+import { Framework, IStream } from "@superfluid-finance/sdk-core";
+import { Subscribers } from "@/ui/subscribers";
 
 export default function Page({ params }: { params: { id: ProfileId } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
+  const [subscriptions, setSubscriptions] = useState<IStream[]>([]);
   const [tbaDeployed, setTbaDeployed] = useState(true);
   const { data: profile, loading: profileLoading } = useProfile({
     profileId: params.id,
@@ -29,6 +33,26 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
   const tokenId = useMemo(() => {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
   }, [profile]);
+
+  const fetchStreams = useCallback(async () => {
+    const sf = await Framework.create({
+      chainId: wagmiNetwork.id,
+      provider: wagmiClient.provider,
+    });
+
+    const pageResult = await sf.query.listStreams(
+      { receiver: tba },
+      { take: 100 },
+      {
+        orderBy: "createdAtBlockNumber",
+        orderDirection: "desc",
+      }
+    );
+
+    if (pageResult && pageResult.data) {
+      setSubscriptions(pageResult.data);
+    }
+  }, [tba]);
 
   const fetchTBAAddress = useCallback(() => {
     if (provider && tokenId) {
@@ -49,7 +73,8 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
 
   useEffect(() => {
     fetchTBAAddress();
-  }, [tokenId, fetchTBAAddress]);
+    fetchStreams();
+  }, [tokenId, fetchTBAAddress, fetchStreams, tba]);
 
   const accountCreated = () => {
     fetchTBAAddress();
@@ -62,7 +87,14 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
 
   return (
     <div className="grid gap-7 lg:grid-cols-5">
-      <ProfileDetails profile={profile} tba={tba} />
+      <ProfileDetails
+        profile={profile}
+        tba={tba}
+        tbaDeployed={tbaDeployed}
+        tokenId={tokenId}
+        subscriptions={subscriptions}
+        accountCreated={accountCreated}
+      />
       <div className="col-span-3">
         {/* <div className="flex">
           {tba && (
@@ -78,15 +110,17 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
         </div> */}
         <div className="space-y-5">
           {activeProfile && activeProfile.id === profile.id && (
-            <CreatePost publisher={activeProfile} />
+            <CreatePost publisher={activeProfile} tba={tba} />
           )}
-          <Publications profileId={profile.id} />
+          <Publications profileId={profile.id} tba={tba} />
         </div>
         <div className="mt-5">
           {/* {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />} */}
         </div>
       </div>
-      <div></div>
+      <div>
+        <Subscribers subscriptions={subscriptions} tba={tba} />
+      </div>
     </div>
   );
 }

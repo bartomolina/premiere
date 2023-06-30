@@ -1,6 +1,6 @@
 import { useActiveWallet } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
-import { Framework } from "@superfluid-finance/sdk-core";
+import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -10,7 +10,13 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { SUPERFLUID_TOKEN } from "@/lib/constants";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
 
-export function Subscriptions({ tba }: { tba: `0x${string}` }) {
+export function Subscriptions({
+  tba,
+  subscriptions,
+}: {
+  tba: `0x${string}`;
+  subscriptions: IStream[];
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const [flowRate, setFlowRate] = useState("2");
   const { data: wallet } = useActiveWallet();
@@ -20,8 +26,7 @@ export function Subscriptions({ tba }: { tba: `0x${string}` }) {
   });
   const { disconnectAsync } = useDisconnect();
 
-  const createStream = async () => {
-    setIsLoading(true);
+  const getSFContext = async () => {
     if (isConnected) {
       await disconnectAsync();
     }
@@ -44,18 +49,17 @@ export function Subscriptions({ tba }: { tba: `0x${string}` }) {
       const superSigner = sf.createSigner({ signer });
       const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
 
+      return { superSigner, daix };
+    }
+    return undefined;
+  };
+
+  const createStream = async () => {
+    setIsLoading(true);
+    const sfContext = await getSFContext();
+    if (sfContext) {
+      const { superSigner, daix } = sfContext;
       try {
-        console.log(await superSigner.getAddress());
-        console.log(tba);
-        console.log(
-          ethers.utils
-            .parseEther(
-              (Number.parseInt(flowRate) / (60 * 60 * 24 * 30))
-                .toFixed(18)
-                .toString()
-            )
-            .toString()
-        );
         const createFlowOperation = daix.createFlow({
           sender: await superSigner.getAddress(),
           receiver: tba,
@@ -79,18 +83,53 @@ export function Subscriptions({ tba }: { tba: `0x${string}` }) {
         console.error(error);
       }
     }
-    setIsLoading(false);
+  };
+
+  const deleteStream = async () => {
+    setIsLoading(true);
+    const sfContext = await getSFContext();
+    if (sfContext) {
+      const { superSigner, daix } = sfContext;
+      try {
+        const deleteFlowOperation = daix.deleteFlow({
+          sender: await superSigner.getAddress(),
+          receiver: tba,
+        });
+
+        await deleteFlowOperation.exec(superSigner);
+        toast.success(
+          "Stream deleted. It may take a few minutes until it's reflected in the dashboard"
+        );
+      } catch (error) {
+        toast.error("Error deleting stream");
+        console.error(error);
+      }
+    }
   };
 
   return (
     <>
-      <button
-        disabled={!wallet || isLoading}
-        onClick={createStream}
-        className="btn-secondary btn-sm btn normal-case w-full"
-      >
-        {wallet ? "Subscribe" : "Connect to subscribe"}
-      </button>
+      {subscriptions.filter(
+        (subscription) =>
+          subscription.currentFlowRate != "0" &&
+          subscription.sender.toLowerCase() === wallet?.address.toLowerCase()
+      ).length > 0 ? (
+        <button
+          disabled={isLoading}
+          onClick={deleteStream}
+          className="btn-error btn-sm btn normal-case w-full"
+        >
+          Unsubscribe
+        </button>
+      ) : (
+        <button
+          disabled={!wallet || isLoading}
+          onClick={createStream}
+          className="btn-primary btn-sm btn normal-case w-full"
+        >
+          {wallet ? "Subscribe" : "Connect to subscribe"}
+        </button>
+      )}
     </>
   );
 }

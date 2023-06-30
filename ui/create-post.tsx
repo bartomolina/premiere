@@ -2,10 +2,8 @@ import { upload } from "@/lib/bundlr";
 import {
   type ProfileOwnedByMe,
   useCreatePost,
-  ContentFocus,
-  CollectPolicyType,
-  type ReferencePolicy,
   useApolloClient,
+  appId,
 } from "@lens-protocol/react-web";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
@@ -20,7 +18,7 @@ import { gql } from "@apollo/client";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { toast } from "react-toastify";
 import { wagmiClient } from "@/lib/wagmi-client";
-import { LENS_HUB_ADDRESS, LENS_NETWORK } from "@/lib/constants";
+import { APP_ID, CHAIN, LENS_HUB_ADDRESS, LENS_NETWORK } from "@/lib/constants";
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
 import { createPostQuery } from "@/lib/api";
@@ -28,12 +26,19 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { ethers, utils } from "ethers";
 import omitDeep from "omit-deep";
 import LensHubAbi from "@/lib/abi/lens-hub-contract-abi.json";
+import { decrypt, encrypt } from "@/lib/lit";
 
 interface IFormInput {
   post: string;
 }
 
-export function CreatePost({ publisher }: { publisher: ProfileOwnedByMe }) {
+export function CreatePost({
+  publisher,
+  tba,
+}: {
+  publisher: ProfileOwnedByMe;
+  tba: `0x${string}`;
+}) {
   const {
     execute: create,
     error,
@@ -52,16 +57,47 @@ export function CreatePost({ publisher }: { publisher: ProfileOwnedByMe }) {
   const { mutate } = useApolloClient();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    const { encryptedString, encryptedSymmetricKey } = await encrypt(
+      data.post,
+      tba,
+      Number.parseInt(publisher.id, 16).toString()
+    );
+
     const postData: MetadataV2 = {
       version: "2.0.0",
       metadata_id: uuidv4(),
-      content: data.post,
+      content: "This publication is gated.",
       locale: "en",
       mainContentFocus: PublicationMainFocus.TextOnly,
-      description: "Gated publication",
-      name: "Gated publication",
+      description: "This publication is gated.",
+      name: "This publication is gated.",
       attributes: [],
-      appId: "mosaic",
+      appId: appId(APP_ID),
+      encryptionParams: {
+        encryptedFields: {
+          content: encryptedString,
+        },
+        providerSpecificParams: {
+          encryptionKey: encryptedSymmetricKey,
+        },
+        encryptionProvider: "LIT_PROTOCOL",
+        accessCondition: {
+          or: {
+            criteria: [
+              {
+                profile: {
+                  profileId: publisher.id,
+                },
+              },
+              {
+                profile: {
+                  profileId: publisher.id,
+                },
+              },
+            ],
+          },
+        },
+      },
     };
 
     let connector;
@@ -77,36 +113,7 @@ export function CreatePost({ publisher }: { publisher: ProfileOwnedByMe }) {
 
     if (connector instanceof InjectedConnector) {
       const signer = await connector.getSigner();
-
-      const nftAccessCondition: NftOwnership = {
-        contractAddress: LENS_HUB_ADDRESS,
-        chainID: LENS_NETWORK === "mainnet" ? 137 : 80001,
-        contractType: ContractType.Erc721,
-        tokenIds: ["32889"],
-      };
-
-      const sdk = await LensGatedSDK.create({
-        provider: wagmiClient.provider,
-        signer,
-        env:
-          LENS_NETWORK === "mainnet"
-            ? LensEnvironment.Polygon
-            : LensEnvironment.Mumbai,
-      });
-
-      await sdk.connect({
-        address: await signer.getAddress(), // your signer's wallet address
-        env: LensEnvironment.Mumbai,
-      });
-
-      const { contentURI, encryptedMetadata } = await sdk.gated.encryptMetadata(
-        postData,
-        publisher.id,
-        {
-          nft: nftAccessCondition,
-        }, // or any other access condition object
-        upload
-      );
+      const contentURI = await upload(postData);
 
       const typedResult = await mutate({
         mutation: gql(createPostQuery),
