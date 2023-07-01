@@ -45,8 +45,13 @@ export function LensLogin() {
     if (isConnected) {
       await disconnectAsync();
     }
-
-    const { connector } = await connectAsync();
+    let connector;
+    try {
+      ({ connector } = await connectAsync());
+    } catch (error) {
+      toast.error("Error connecting to wallet");
+      console.error(error);
+    }
 
     if (connector instanceof InjectedConnector) {
       const signer = await connector.getSigner();

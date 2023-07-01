@@ -86,7 +86,7 @@ export default function Page({ params }: { params: { handle: string } }) {
         }
       }
     }
-  }, [tokenId, provider, connectAsync, disconnectAsync, isConnected]);
+  }, [tokenId, provider]);
 
   useEffect(() => {
     fetchTBAAddress();
