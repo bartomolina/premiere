@@ -1,4 +1,8 @@
-import { useActiveWallet } from "@lens-protocol/react-web";
+import {
+  Profile,
+  useActiveProfile,
+  useActiveWallet,
+} from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
@@ -10,21 +14,26 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { SUPERFLUID_TOKEN } from "@/lib/constants";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
 
+const daiMonth = "2";
+
 export function Subscriptions({
   tba,
+  profile,
   subscriptions,
 }: {
   tba: `0x${string}`;
+  profile: Profile;
   subscriptions: IStream[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [flowRate, setFlowRate] = useState("2");
+  const [flowRate, setFlowRate] = useState(daiMonth);
   const { data: wallet } = useActiveWallet();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({
     connector: new InjectedConnector(),
   });
   const { disconnectAsync } = useDisconnect();
+  const { data: activeProfile } = useActiveProfile();
 
   const getSFContext = async () => {
     if (isConnected) {
@@ -123,11 +132,11 @@ export function Subscriptions({
         </button>
       ) : (
         <button
-          disabled={!wallet || isLoading}
+          disabled={!wallet || isLoading || profile.id === activeProfile?.id}
           onClick={createStream}
           className="btn-primary btn-sm btn normal-case w-full"
         >
-          {wallet ? "Subscribe" : "Connect to subscribe"}
+          {wallet ? `🌟 ${daiMonth} DAI / month` : "Connect to subscribe"}
         </button>
       )}
     </>

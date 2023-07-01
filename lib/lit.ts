@@ -54,6 +54,15 @@ const blobToBase64 = (blob) => {
   });
 };
 
+export const prepareSig = async () => {
+  const client = new LitJsSdk.LitNodeClient({ debug: false });
+  await client.connect();
+  window.litNodeClient = client;
+  await LitJsSdk.checkAndSignAuthMessage({
+    chain: CHAIN,
+  });
+};
+
 export const encrypt = async (
   content: string,
   address: string,
@@ -91,7 +100,7 @@ export const decrypt = async (
   profileId: string
 ) => {
   const encryptedBlob = await (await fetch(content)).blob();
-  const client = new LitJsSdk.LitNodeClient({ debug: true });
+  const client = new LitJsSdk.LitNodeClient({ debug: false });
   await client.connect();
   window.litNodeClient = client;
   const authSig = await LitJsSdk.checkAndSignAuthMessage({

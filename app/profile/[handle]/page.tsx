@@ -5,11 +5,10 @@ import {
   useProfile,
   useActiveProfile,
 } from "@lens-protocol/react-web";
-import { getAccount } from "@tokenbound/sdk-ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useProvider } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useProvider } from "wagmi";
 
-import { LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
+import { HANDLE_SUFFIX, LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
 import { Assets } from "@/ui/assets";
 import { CreateTba } from "@/ui/create-tba";
 import { ProfileDetails } from "@/ui/profile-details";
@@ -19,20 +18,46 @@ import { Publications } from "@/ui/publications";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { Subscribers } from "@/ui/subscribers";
+import { toast } from "react-toastify";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { TokenboundClient } from "@tokenbound/sdk";
 
-export default function Page({ params }: { params: { id: ProfileId } }) {
+export default function Page({ params }: { params: { handle: string } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
   const [subscriptions, setSubscriptions] = useState<IStream[]>([]);
   const [tbaDeployed, setTbaDeployed] = useState(true);
   const { data: profile, loading: profileLoading } = useProfile({
-    profileId: params.id,
+    handle: `${params.handle}${HANDLE_SUFFIX}`,
   });
   const { data: activeProfile } = useActiveProfile();
+  const { isConnected } = useAccount();
+  const { connectAsync } = useConnect({
+    connector: new InjectedConnector(),
+  });
+  const { disconnectAsync } = useDisconnect();
   const provider = useProvider();
 
   const tokenId = useMemo(() => {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
   }, [profile]);
+
+  const getSigner = async () => {
+    if (isConnected) {
+      await disconnectAsync();
+    }
+    let connector;
+    try {
+      ({ connector } = await connectAsync());
+    } catch (error) {
+      toast.error("Error connecting to wallet");
+      console.error(error);
+    }
+
+    if (connector instanceof InjectedConnector) {
+      return await connector.getSigner();
+    }
+    return undefined;
+  };
 
   const fetchStreams = useCallback(async () => {
     const sf = await Framework.create({
@@ -54,22 +79,28 @@ export default function Page({ params }: { params: { id: ProfileId } }) {
     }
   }, [tba]);
 
-  const fetchTBAAddress = useCallback(() => {
-    if (provider && tokenId) {
-      getAccount(LENS_HUB_ADDRESS, tokenId, provider)
-        .then((address) => {
-          setTba(address);
-          return provider.getCode(address);
-        })
-        .then((code) => {
-          if (code === "0x") {
-            setTbaDeployed(false);
-          } else {
-            setTbaDeployed(true);
-          }
+  const fetchTBAAddress = useCallback(async () => {
+    if (tokenId) {
+      const signer = await getSigner();
+      if (signer) {
+        const tokenboundClient = new TokenboundClient({
+          signer,
+          chainId: wagmiNetwork.id,
         });
+        const address = await tokenboundClient.getAccount({
+          tokenContract: LENS_HUB_ADDRESS,
+          tokenId,
+        });
+        setTba(address);
+        const code = await provider.getCode(address);
+        if (code === "0x") {
+          setTbaDeployed(false);
+        } else {
+          setTbaDeployed(true);
+        }
+      }
     }
-  }, [provider, tokenId]);
+  }, [tokenId]);
 
   useEffect(() => {
     fetchTBAAddress();

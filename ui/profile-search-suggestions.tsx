@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getAvatar } from "@/lib/get-avatar";
-import { getProfileName } from "@/lib/get-profile-info";
+import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 
 export function ProfileSearchSuggestions({
   query,
@@ -29,35 +29,39 @@ export function ProfileSearchSuggestions({
   };
 
   return (
-    <ul
-      tabIndex={0}
-      className="dropdown-content menu menu-sm z-10 mt-2 w-full max-w-xs rounded-lg border border-primary bg-base-100 p-0"
-    >
-      {profiles?.map((profile) => (
-        <li key={profile.id}>
-          <Link
-            className="rounded-none p-3"
-            href={`/profile/${profile.id}`}
-            onClick={closeDropdown}
-          >
-            <div className="relative h-8 w-8">
-              <Image
-                src={getAvatar(profile)}
-                alt={profile.handle}
-                fill
-                sizes="(max-width: 32px) 100vw"
-                className="rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="font-semibold text-primary">
-                {getProfileName(profile)}
-              </p>
-              <p>{profile.handle}</p>
-            </div>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <>
+      {!!profiles?.length && (
+        <ul
+          tabIndex={0}
+          className="dropdown-content menu menu-sm min-w-[211.5px] z-10 mt-2 rounded-lg border border-primary bg-base-100 p-0"
+        >
+          {profiles?.map((profile) => (
+            <li key={profile.id}>
+              <Link
+                className="rounded-none p-3"
+                href={`/profile/${getBaseProfileHandle(profile)}`}
+                onClick={closeDropdown}
+              >
+                <div className="relative h-8 w-8">
+                  <Image
+                    src={getAvatar(profile)}
+                    alt={profile.handle}
+                    fill
+                    sizes="(max-width: 32px) 100vw"
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-semibold text-primary">
+                    {getProfileName(profile)}
+                  </p>
+                  <p>{profile.handle}</p>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }

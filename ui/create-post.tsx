@@ -161,7 +161,7 @@ export function CreatePost({
           rows={4}
           name="post"
           id="post"
-          className="textarea-bordered textarea-primary textarea textarea-sm w-full focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
+          className="textarea-bordered textarea-primary textarea textarea-md w-full text-sm focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
           defaultValue={""}
         />
       </div>

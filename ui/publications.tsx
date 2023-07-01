@@ -9,6 +9,7 @@ import { gql } from "@apollo/client";
 import { getPublicationsQuery } from "@/lib/api";
 import { Publication } from "./publication";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import { prepareSig } from "@/lib/lit";
 
 export function Publications({
   profileId,
@@ -18,6 +19,7 @@ export function Publications({
   tba: `0x${string}`;
 }) {
   const [publications, setPublications] = useState<Post[]>([]);
+  const [sigReady, setSigReady] = useState(false);
   const { query } = useApolloClient();
   const { data: activeWallet } = useActiveWallet();
 
@@ -28,7 +30,6 @@ export function Publications({
         fetchPolicy: "no-cache",
         variables: {
           profileId,
-          observer: activeWallet?.address,
         },
       });
       setPublications(response.data.publications.items);
@@ -39,11 +40,26 @@ export function Publications({
     }
   }, [profileId, tba]);
 
+  useEffect(() => {
+    prepareSig().then(() => setSigReady(true));
+  }, []);
+
   return (
     <div className="space-y-5">
-      {publications?.map((publication) => (
-        <Publication key={publication.id} publication={publication} tba={tba} />
-      ))}
+      {publications.length ? (
+        publications?.map((publication) => (
+          <Publication
+            key={publication.id}
+            publication={publication}
+            tba={tba}
+            sigReady={sigReady}
+          />
+        ))
+      ) : (
+        <div className="relative p-5 text-sm border-primary border rounded-lg">
+          No posts yet 😔
+        </div>
+      )}
     </div>
   );
 }

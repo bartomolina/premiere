@@ -40,6 +40,10 @@ export const MOSAIC_TOKEN_MINTER_ADDRESS =
     : "0xf41662e438e8b42fa54900c2e42b66a3c584937e";
 export const NFT_ITEMS = 10_000;
 export const SUPERFLUID_TOKEN = LENS_NETWORK === "mainnet" ? "DAIx" : "fDAIx";
+export const SUPERFLUID_TOKEN_ADDRESS =
+  LENS_NETWORK === "mainnet"
+    ? "0x1305F6B6Df9Dc47159D12Eb7aC2804d4A33173c2"
+    : "0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f";
 export const SUPERFLUID_STREAM_URL =
   LENS_NETWORK === "mainnet"
     ? "https://console.superfluid.finance/matic/streams/"

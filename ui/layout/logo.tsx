@@ -4,7 +4,7 @@ import Link from "next/link";
 export function Logo() {
   return (
     <Link href={"/"}>
-      <div className="relative h-16 w-40 lg:w-52">
+      <div className="relative h-16 w-40 lg:w-48">
         <Image
           src={"/logo.svg"}
           alt="m0saic"

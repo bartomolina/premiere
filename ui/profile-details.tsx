@@ -34,7 +34,11 @@ export function ProfileDetails({
         priority
         className="rounded-lg object-cover"
       />
-      <Subscriptions tba={tba} subscriptions={subscriptions} />
+      <Subscriptions
+        tba={tba}
+        profile={profile}
+        subscriptions={subscriptions}
+      />
       <div>
         <div className="font-semibold text-primary">
           {getProfileName(profile)}
@@ -50,18 +54,7 @@ export function ProfileDetails({
             <ArrowSquareOut />
           </a>
         </div>
-        <a
-          className="flex items-center gap-1 text-gray-500 hover:underline"
-          href={`${OPENSEA_URL}${LENS_HUB_ADDRESS}/${Number.parseInt(
-            profile.id,
-            16
-          )}`}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          View on OpenSea
-          <ArrowSquareOut />
-        </a>
+        <div className="text-xs mt-2">{profile.bio}</div>
       </div>
       <TbaDetails
         profile={profile}
