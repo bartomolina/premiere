@@ -34,24 +34,6 @@ export default function Page({ params }: { params: { handle: string } }) {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
   }, [profile]);
 
-  const getSigner = useCallback(async () => {
-    if (isConnected) {
-      await disconnectAsync();
-    }
-    let connector;
-    try {
-      ({ connector } = await connectAsync());
-    } catch (error) {
-      toast.error("Error connecting to wallet");
-      console.error(error);
-    }
-
-    if (connector instanceof InjectedConnector) {
-      return await connector.getSigner();
-    }
-    return;
-  }, [connectAsync, disconnectAsync, isConnected]);
-
   const fetchStreams = useCallback(async () => {
     const sf = await Framework.create({
       chainId: wagmiNetwork.id,
@@ -73,9 +55,20 @@ export default function Page({ params }: { params: { handle: string } }) {
   }, [tba]);
 
   const fetchTBAAddress = useCallback(async () => {
-    if (tokenId && provider && getSigner) {
-      const signer = await getSigner();
-      if (signer) {
+    if (tokenId && provider) {
+      if (isConnected) {
+        await disconnectAsync();
+      }
+      let connector;
+      try {
+        ({ connector } = await connectAsync());
+      } catch (error) {
+        toast.error("Error connecting to wallet");
+        console.error(error);
+      }
+
+      if (connector instanceof InjectedConnector) {
+        const signer = await connector.getSigner();
         const tokenboundClient = new TokenboundClient({
           signer,
           chainId: wagmiNetwork.id,
@@ -93,7 +86,7 @@ export default function Page({ params }: { params: { handle: string } }) {
         }
       }
     }
-  }, [tokenId, getSigner, provider]);
+  }, [tokenId, provider, connectAsync, disconnectAsync, isConnected]);
 
   useEffect(() => {
     fetchTBAAddress();
