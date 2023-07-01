@@ -1,5 +1,6 @@
 import { type Profile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
+import Image from "next/image";
 
 import {
   LENS_HUB_ADDRESS,
@@ -7,7 +8,7 @@ import {
   POLYGONSCAN_URL,
 } from "@/lib/constants";
 import { truncateAddr } from "@/lib/truncate-address";
-import Image from "next/image";
+
 import { CreateTba } from "./create-tba";
 
 export function TbaDetails({
@@ -24,11 +25,11 @@ export function TbaDetails({
   accountCreated: () => void;
 }) {
   return (
-    <div className="pt-5 text-sm space-y-4">
+    <div className="space-y-4 pt-5 text-sm">
       <div>
         <a
           href="https://tokenbound.org/"
-          className="flex gap-2 items-center"
+          className="flex items-center gap-2"
           target="_blank"
           rel="noreferrer noopener"
         >

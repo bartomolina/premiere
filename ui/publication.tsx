@@ -4,18 +4,16 @@ import {
   type Post,
 } from "@lens-protocol/react-web";
 import { type MetadataV2 } from "@lens-protocol/sdk-gated";
-import { useEffect, useState } from "react";
-import { LensGatedSDK, LensEnvironment } from "@lens-protocol/sdk-gated";
-import { wagmiClient } from "@/lib/wagmi-client";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { APP_ID, LENS_NETWORK, ZERO_ADDRESS } from "@/lib/constants";
-import { toast } from "react-toastify";
-import { Star, Lock } from "@phosphor-icons/react";
-import { decrypt } from "@/lib/lit";
+import { Lock, Star } from "@phosphor-icons/react";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import omitDeep from "omit-deep";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+import { APP_ID, ZERO_ADDRESS } from "@/lib/constants";
+import { decrypt } from "@/lib/lit";
 
 export function Publication({
   publication,
@@ -53,13 +51,15 @@ export function Publication({
             newMetadata.content = decryptedString;
             setMetadata(newMetadata);
             setUnlocked(true);
-          } catch (error) {
+          } catch {
             console.log("You don't have access to the publication");
           }
         }
       };
       if (
         publication?.isGated &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         publication.appId === appId(APP_ID) &&
         tba != ZERO_ADDRESS
       ) {
@@ -69,9 +69,9 @@ export function Publication({
   }, [publication, tba, sigReady]);
 
   return (
-    <div className="  text-sm border-primary border rounded-lg">
+    <div className="  rounded-lg border border-primary text-sm">
       {publication.isGated && (
-        <div className="flex w-full justify-end pt-3 px-5">
+        <div className="flex w-full justify-end px-5 pt-3">
           {unlocked ? (
             <Star
               width={15}
@@ -89,7 +89,7 @@ export function Publication({
           )}
         </div>
       )}
-      <div className="p-5 prose prose-sm">
+      <div className="prose-sm prose p-5">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {metadata.content}
         </ReactMarkdown>

@@ -1,15 +1,16 @@
+import { gql } from "@apollo/client";
 import {
-  Post,
-  ProfileId,
-  useActiveWallet,
+  type Post,
+  type ProfileId,
   useApolloClient,
 } from "@lens-protocol/react-web";
 import { useEffect, useState } from "react";
-import { gql } from "@apollo/client";
+
 import { getPublicationsQuery } from "@/lib/api";
-import { Publication } from "./publication";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { prepareSig } from "@/lib/lit";
+
+import { Publication } from "./publication";
 
 export function Publications({
   profileId,
@@ -21,7 +22,6 @@ export function Publications({
   const [publications, setPublications] = useState<Post[]>([]);
   const [sigReady, setSigReady] = useState(false);
   const { query } = useApolloClient();
-  const { data: activeWallet } = useActiveWallet();
 
   useEffect(() => {
     const fetchPublications = async () => {
@@ -38,7 +38,7 @@ export function Publications({
     if (profileId && tba != ZERO_ADDRESS) {
       fetchPublications();
     }
-  }, [profileId, tba]);
+  }, [profileId, tba, query]);
 
   useEffect(() => {
     prepareSig().then(() => setSigReady(true));
@@ -46,7 +46,7 @@ export function Publications({
 
   return (
     <div className="space-y-5">
-      {publications.length ? (
+      {publications.length > 0 ? (
         publications?.map((publication) => (
           <Publication
             key={publication.id}
@@ -56,7 +56,7 @@ export function Publications({
           />
         ))
       ) : (
-        <div className="relative p-5 text-sm border-primary border rounded-lg">
+        <div className="relative rounded-lg border border-primary p-5 text-sm">
           No posts yet 😔
         </div>
       )}

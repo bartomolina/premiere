@@ -30,15 +30,6 @@ export const ALCHEMY_API_KEY =
   (LENS_NETWORK === "mainnet"
     ? process.env.NEXT_PUBLIC_ALCHEMY_POLYGON_KEY
     : process.env.NEXT_PUBLIC_ALCHEMY_MUMBAI_KEY) ?? "demo";
-export const MOSAIC_NFT_MINTER_ADDRESS =
-  LENS_NETWORK === "mainnet"
-    ? "0x409f92119848c1E43c1b4dcb2F5F4D96AE123B55"
-    : "0xfF4db45e8a296789e68aB0fFE9a0644a33707e20";
-export const MOSAIC_TOKEN_MINTER_ADDRESS =
-  LENS_NETWORK === "mainnet"
-    ? "0x46ADa0B766A2a937d5461017eC19e6cA1033824c"
-    : "0xf41662e438e8b42fa54900c2e42b66a3c584937e";
-export const NFT_ITEMS = 10_000;
 export const SUPERFLUID_TOKEN = LENS_NETWORK === "mainnet" ? "DAIx" : "fDAIx";
 export const SUPERFLUID_TOKEN_ADDRESS =
   LENS_NETWORK === "mainnet"

@@ -1,3 +1,7 @@
+import { type Profile, useActiveProfile } from "@lens-protocol/react-web";
+import { TokenboundClient } from "@tokenbound/sdk";
+import { ethers } from "ethers";
+import { Interface } from "ethers/lib/utils.js";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount, useBalance, useConnect, useDisconnect } from "wagmi";
@@ -8,11 +12,7 @@ import {
   SUPERFLUID_TOKEN,
   SUPERFLUID_TOKEN_ADDRESS,
 } from "@/lib/constants";
-import { TokenboundClient } from "@tokenbound/sdk";
 import { wagmiNetwork } from "@/lib/wagmi-client";
-import { Interface } from "ethers/lib/utils.js";
-import { ethers } from "ethers";
-import { Profile, useActiveProfile } from "@lens-protocol/react-web";
 
 const iface = new Interface([
   "function transfer(address recipient, uint256 amount)",
@@ -58,7 +58,7 @@ export function CreateTba({
     if (connector instanceof InjectedConnector) {
       return await connector.getSigner();
     }
-    return undefined;
+    return;
   };
 
   const deployTBA = async () => {
@@ -75,6 +75,8 @@ export function CreateTba({
             tokenContract: LENS_HUB_ADDRESS,
             tokenId,
           });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           await toast.promise(tx.wait(), {
             pending: "Creating account",
             success: "Account created",

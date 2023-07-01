@@ -1,32 +1,27 @@
-import { upload } from "@/lib/bundlr";
-import {
-  type ProfileOwnedByMe,
-  useCreatePost,
-  useApolloClient,
-  appId,
-} from "@lens-protocol/react-web";
-import { useForm, SubmitHandler } from "react-hook-form";
-import {
-  MetadataV2,
-  NftOwnership,
-  PublicationMainFocus,
-  ContractType,
-  LensGatedSDK,
-  LensEnvironment,
-} from "@lens-protocol/sdk-gated";
 import { gql } from "@apollo/client";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import {
+  appId,
+  type ProfileOwnedByMe,
+  useApolloClient,
+} from "@lens-protocol/react-web";
+import { MetadataV2, PublicationMainFocus } from "@lens-protocol/sdk-gated";
+import { ethers, utils } from "ethers";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import omitDeep from "omit-deep";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { wagmiClient } from "@/lib/wagmi-client";
-import { APP_ID, CHAIN, LENS_HUB_ADDRESS, LENS_NETWORK } from "@/lib/constants";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { v4 as uuidv4 } from "uuid";
-import { createPostQuery } from "@/lib/api";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { ethers, utils } from "ethers";
-import omitDeep from "omit-deep";
+
 import LensHubAbi from "@/lib/abi/lens-hub-contract-abi.json";
-import { decrypt, encrypt } from "@/lib/lit";
+import { createPostQuery } from "@/lib/api";
+import { upload } from "@/lib/bundlr";
+import { APP_ID, LENS_HUB_ADDRESS } from "@/lib/constants";
+import { encrypt } from "@/lib/lit";
 
 interface IFormInput {
   post: string;
@@ -39,11 +34,6 @@ export function CreatePost({
   publisher: ProfileOwnedByMe;
   tba: `0x${string}`;
 }) {
-  const {
-    execute: create,
-    error,
-    isPending,
-  } = useCreatePost({ publisher, upload });
   const {
     register,
     handleSubmit,
@@ -73,6 +63,8 @@ export function CreatePost({
       name: "This publication is gated.",
       attributes: [],
       appId: appId(APP_ID),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       encryptionParams: {
         encryptedFields: {
           content: encryptedString,
@@ -123,17 +115,16 @@ export function CreatePost({
         },
       });
 
-      // @ts-ignore
       const typedData = typedResult.data.createPostTypedData.typedData;
       const lensHub = new ethers.Contract(LENS_HUB_ADDRESS, LensHubAbi, signer);
-      const signature = await await signer._signTypedData(
+      const signature = await signer._signTypedData(
         omitDeep(typedData.domain, "__typename"),
         omitDeep(typedData.types, "__typename"),
         omitDeep(typedData.value, "__typename")
       );
       const { v, r, s } = utils.splitSignature(signature);
 
-      const result = await lensHub.postWithSig({
+      await lensHub.postWithSig({
         profileId: typedData.value.profileId,
         contentURI: typedData.value.contentURI,
         collectModule: typedData.value.collectModule,
@@ -165,7 +156,7 @@ export function CreatePost({
           defaultValue={""}
         />
       </div>
-      <span className="text-error text-sm">
+      <span className="text-sm text-error">
         {errors.post && <p>Post is required.</p>}
       </span>
       <div className="mt-2 flex justify-end">

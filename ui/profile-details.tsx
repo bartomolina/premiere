@@ -1,12 +1,13 @@
 import { type Profile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
+import { IStream } from "@superfluid-finance/sdk-core";
 import Image from "next/image";
 
-import { LENS_HUB_ADDRESS, LENSTER_URL, OPENSEA_URL } from "@/lib/constants";
+import { LENSTER_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
+
 import { Subscriptions } from "./subscriptions";
-import { IStream } from "@superfluid-finance/sdk-core";
 import { TbaDetails } from "./tba-details";
 
 export function ProfileDetails({
@@ -54,7 +55,7 @@ export function ProfileDetails({
             <ArrowSquareOut />
           </a>
         </div>
-        <div className="text-xs mt-2">{profile.bio}</div>
+        <div className="mt-2 text-xs">{profile.bio}</div>
       </div>
       <TbaDetails
         profile={profile}

@@ -5,10 +5,10 @@ import { twMerge } from "tailwind-merge";
 import { navigation } from "@/lib/navigation";
 import { ThemeChanger } from "@/ui/layout/theme-changer";
 
+import { ProfileSearch } from "../profile-search";
 import { LensLogin } from "./lens-login";
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
-import { ProfileSearch } from "../profile-search";
 
 export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
   return (

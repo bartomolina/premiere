@@ -1,6 +1,7 @@
 import { IStream } from "@superfluid-finance/sdk-core";
-import { Subscriber } from "./subscriber";
 import { useMemo } from "react";
+
+import { Subscriber } from "./subscriber";
 
 export function Subscribers({
   subscriptions,
@@ -15,12 +16,12 @@ export function Subscribers({
         subscription.currentFlowRate != "0" &&
         subscription.receiver.toLowerCase() === tba.toLowerCase()
     );
-  }, [subscriptions]);
+  }, [subscriptions, tba]);
 
   return (
     <div className="space-y-3">
       <div className="text-sm font-medium">Subscribers</div>
-      {filteredSubscriptions.length ? (
+      {filteredSubscriptions.length > 0 ? (
         filteredSubscriptions.map((subscription) => (
           <Subscriber key={subscription.id} subscription={subscription} />
         ))

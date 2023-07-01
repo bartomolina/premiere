@@ -1,9 +1,8 @@
 import {
-  Profile,
+  type Profile,
   useActiveProfile,
   useActiveWallet,
 } from "@lens-protocol/react-web";
-import { ArrowSquareOut } from "@phosphor-icons/react";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 import { useState } from "react";
@@ -14,7 +13,7 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { SUPERFLUID_TOKEN } from "@/lib/constants";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
 
-const daiMonth = "2";
+const flowRate = "2";
 
 export function Subscriptions({
   tba,
@@ -26,7 +25,6 @@ export function Subscriptions({
   subscriptions: IStream[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [flowRate, setFlowRate] = useState(daiMonth);
   const { data: wallet } = useActiveWallet();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({
@@ -60,7 +58,7 @@ export function Subscriptions({
 
       return { superSigner, daix };
     }
-    return undefined;
+    return;
   };
 
   const createStream = async () => {
@@ -118,15 +116,15 @@ export function Subscriptions({
 
   return (
     <>
-      {subscriptions.filter(
+      {subscriptions.some(
         (subscription) =>
           subscription.currentFlowRate != "0" &&
           subscription.sender.toLowerCase() === wallet?.address.toLowerCase()
-      ).length > 0 ? (
+      ) ? (
         <button
           disabled={isLoading}
           onClick={deleteStream}
-          className="btn-error btn-sm btn normal-case w-full"
+          className="btn-error btn-sm btn w-full normal-case"
         >
           Unsubscribe
         </button>
@@ -134,9 +132,9 @@ export function Subscriptions({
         <button
           disabled={!wallet || isLoading || profile.id === activeProfile?.id}
           onClick={createStream}
-          className="btn-primary btn-sm btn normal-case w-full"
+          className="btn-primary btn-sm btn w-full normal-case"
         >
-          {wallet ? `🌟 ${daiMonth} DAI / month` : "Connect to subscribe"}
+          {wallet ? `🌟 ${flowRate} DAI / month` : "Connect to subscribe"}
         </button>
       )}
     </>

@@ -1,26 +1,19 @@
 "use client";
 
-import {
-  type ProfileId,
-  useProfile,
-  useActiveProfile,
-} from "@lens-protocol/react-web";
+import { useActiveProfile, useProfile } from "@lens-protocol/react-web";
+import { Framework, IStream } from "@superfluid-finance/sdk-core";
+import { TokenboundClient } from "@tokenbound/sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect, useProvider } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 import { HANDLE_SUFFIX, LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
-import { Assets } from "@/ui/assets";
-import { CreateTba } from "@/ui/create-tba";
-import { ProfileDetails } from "@/ui/profile-details";
-import { TbaDetails } from "@/ui/tba-details";
-import { CreatePost } from "@/ui/create-post";
-import { Publications } from "@/ui/publications";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
-import { Framework, IStream } from "@superfluid-finance/sdk-core";
+import { CreatePost } from "@/ui/create-post";
+import { ProfileDetails } from "@/ui/profile-details";
+import { Publications } from "@/ui/publications";
 import { Subscribers } from "@/ui/subscribers";
-import { toast } from "react-toastify";
-import { InjectedConnector } from "wagmi/connectors/injected";
-import { TokenboundClient } from "@tokenbound/sdk";
 
 export default function Page({ params }: { params: { handle: string } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
@@ -41,7 +34,7 @@ export default function Page({ params }: { params: { handle: string } }) {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
   }, [profile]);
 
-  const getSigner = async () => {
+  const getSigner = useCallback(async () => {
     if (isConnected) {
       await disconnectAsync();
     }
@@ -56,8 +49,8 @@ export default function Page({ params }: { params: { handle: string } }) {
     if (connector instanceof InjectedConnector) {
       return await connector.getSigner();
     }
-    return undefined;
-  };
+    return;
+  }, [connectAsync, disconnectAsync, isConnected]);
 
   const fetchStreams = useCallback(async () => {
     const sf = await Framework.create({
@@ -80,7 +73,7 @@ export default function Page({ params }: { params: { handle: string } }) {
   }, [tba]);
 
   const fetchTBAAddress = useCallback(async () => {
-    if (tokenId) {
+    if (tokenId && provider && getSigner) {
       const signer = await getSigner();
       if (signer) {
         const tokenboundClient = new TokenboundClient({
@@ -100,7 +93,7 @@ export default function Page({ params }: { params: { handle: string } }) {
         }
       }
     }
-  }, [tokenId]);
+  }, [tokenId, getSigner, provider]);
 
   useEffect(() => {
     fetchTBAAddress();

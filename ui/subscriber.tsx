@@ -1,11 +1,13 @@
-import { SUPERFLUID_STREAM_URL } from "@/lib/constants";
-import { getAvatar } from "@/lib/get-avatar";
-import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 import { useProfilesOwnedBy } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
+import { type IStream } from "@superfluid-finance/sdk-core";
 import { ethers } from "ethers";
 import Image from "next/image";
 import Link from "next/link";
+
+import { SUPERFLUID_STREAM_URL } from "@/lib/constants";
+import { getAvatar } from "@/lib/get-avatar";
+import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 
 export function Subscriber({ subscription }: { subscription: IStream }) {
   const { data: sender } = useProfilesOwnedBy({
@@ -21,6 +23,7 @@ export function Subscriber({ subscription }: { subscription: IStream }) {
     30;
 
   if (!sender || sender.length === 0) {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
 
