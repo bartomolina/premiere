@@ -1,6 +1,6 @@
 "use client";
 
-import { useActiveProfile, useProfile } from "@lens-protocol/react-web";
+import { useProfile } from "@lens-protocol/react-web";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,7 +10,6 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 
 import { HANDLE_SUFFIX, LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
 import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
-import { CreatePost } from "@/ui/create-post";
 import { ProfileDetails } from "@/ui/profile-details";
 import { Publications } from "@/ui/publications";
 import { Subscribers } from "@/ui/subscribers";
@@ -22,7 +21,6 @@ export default function Page({ params }: { params: { handle: string } }) {
   const { data: profile, loading: profileLoading } = useProfile({
     handle: `${params.handle}${HANDLE_SUFFIX}`,
   });
-  const { data: activeProfile } = useActiveProfile();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({
     connector: new InjectedConnector(),
@@ -73,7 +71,7 @@ export default function Page({ params }: { params: { handle: string } }) {
           signer,
           chainId: wagmiNetwork.id,
         });
-        const address = await tokenboundClient.getAccount({
+        const address = tokenboundClient.getAccount({
           tokenContract: LENS_HUB_ADDRESS,
           tokenId,
         });
@@ -103,7 +101,7 @@ export default function Page({ params }: { params: { handle: string } }) {
   }
 
   return (
-    <div className="grid gap-7 lg:grid-cols-5">
+    <div className="space-y-3 md:grid md:grid-cols-5 md:gap-7 md:space-y-0">
       <ProfileDetails
         profile={profile}
         tba={tba}
@@ -112,30 +110,12 @@ export default function Page({ params }: { params: { handle: string } }) {
         subscriptions={subscriptions}
         accountCreated={accountCreated}
       />
-      <div className="col-span-3">
-        {/* <div className="flex">
-          {tba && (
-            <TbaDetails profile={profile} tba={tba} tbaDeployed={tbaDeployed} />
-          )}
-          <div className="flex w-full justify-end">
-            <CreateTba
-              disabled={tbaDeployed}
-              tokenId={tokenId}
-              accountCreated={accountCreated}
-            />
-          </div>
-        </div> */}
-        <div className="space-y-5">
-          {activeProfile && activeProfile.id === profile.id && (
-            <CreatePost publisher={activeProfile} tba={tba} />
-          )}
+      <div className="md:col-span-3">
+        <div className="md:space-y-5">
           <Publications profileId={profile.id} tba={tba} />
         </div>
-        <div className="mt-5">
-          {/* {tba !== ZERO_ADDRESS && <Assets tba={tba} profile={profile} />} */}
-        </div>
       </div>
-      <div>
+      <div className="">
         <Subscribers subscriptions={subscriptions} tba={tba} />
       </div>
     </div>

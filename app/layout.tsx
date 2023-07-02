@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <Client dashboard={false}>
+          <Client>
             <div className="py-5">{children}</div>
           </Client>
         </Providers>

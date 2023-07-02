@@ -30,14 +30,17 @@ interface IFormInput {
 export function CreatePost({
   publisher,
   tba,
+  fetchPublications,
 }: {
   publisher: ProfileOwnedByMe;
   tba: `0x${string}`;
+  fetchPublications: () => void;
 }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isValid, isSubmitting },
   } = useForm<IFormInput>();
   const { isConnected } = useAccount();
   const { disconnectAsync } = useDisconnect();
@@ -124,7 +127,7 @@ export function CreatePost({
       );
       const { v, r, s } = utils.splitSignature(signature);
 
-      await lensHub.postWithSig({
+      const tx = await lensHub.postWithSig({
         profileId: typedData.value.profileId,
         contentURI: typedData.value.contentURI,
         collectModule: typedData.value.collectModule,
@@ -138,6 +141,15 @@ export function CreatePost({
           deadline: typedData.value.deadline,
         },
       });
+
+      await toast.promise(tx.wait(), {
+        pending: "Posting",
+        success: "Post published",
+        error: "Error posting",
+      });
+
+      fetchPublications();
+      reset();
     }
   };
 
@@ -160,7 +172,11 @@ export function CreatePost({
         {errors.post && <p>Post is required.</p>}
       </span>
       <div className="mt-2 flex justify-end">
-        <button type="submit" className="btn-primary btn-sm btn normal-case">
+        <button
+          disabled={!isValid || isSubmitting}
+          type="submit"
+          className="btn-primary btn-sm btn normal-case"
+        >
           Post
         </button>
       </div>

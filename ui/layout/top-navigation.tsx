@@ -1,6 +1,4 @@
-import { GithubLogo, List } from "@phosphor-icons/react";
-import clsx from "clsx";
-import { twMerge } from "tailwind-merge";
+import { GithubLogo, List,TwitterLogo } from "@phosphor-icons/react";
 
 import { navigation } from "@/lib/navigation";
 import { ThemeChanger } from "@/ui/layout/theme-changer";
@@ -10,9 +8,9 @@ import { LensLogin } from "./lens-login";
 import { Logo } from "./logo";
 import { NavItem } from "./nav-item";
 
-export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
+export function TopNavigation() {
   return (
-    <div className="flex h-24 items-center p-0">
+    <div className="flex h-24 md:grid md:grid-cols-5 md:gap-7">
       <div className="flex items-center gap-2">
         <label
           htmlFor="drawer"
@@ -20,19 +18,14 @@ export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
         >
           <List size={25} />
         </label>
-        <div
-          className={twMerge(
-            "flex items-center gap-5",
-            clsx({
-              "lg:hidden": dashboard,
-            })
-          )}
-        >
+        <div className="hidden items-center md:flex">
           <Logo />
-          <ProfileSearch />
         </div>
       </div>
-      {!dashboard && (
+      <div className="flex items-center md:col-span-2">
+        <ProfileSearch />
+      </div>
+      <div className="flex w-full items-center justify-end gap-4 md:col-span-2">
         <nav className="navbar pl-8">
           {navigation.map((section) => (
             <ul key={section.name} className="menu menu-horizontal gap-5">
@@ -44,8 +37,13 @@ export function TopNavigation({ dashboard = false }: { dashboard?: boolean }) {
             </ul>
           ))}
         </nav>
-      )}
-      <div className="flex items-center gap-4">
+        <a
+          href="https://twitter.com/bartomolina"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <TwitterLogo size={25} alt="Twitter" />
+        </a>
         <a
           href="https://github.com/bartomolina/m0saic"
           target="_blank"

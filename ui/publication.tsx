@@ -89,7 +89,7 @@ export function Publication({
           )}
         </div>
       )}
-      <div className="prose-sm prose p-5">
+      <div className="prose-sm prose m-5 overflow-hidden text-ellipsis">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {metadata.content}
         </ReactMarkdown>

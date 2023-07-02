@@ -18,7 +18,7 @@ export function ThemeChanger() {
   return (
     <div className="flex gap-4">
       <label className="swap swap-rotate">
-        <input type="checkbox" />
+        <input type="checkbox" defaultChecked={true} />
         <Sun
           className="swap-on"
           size={25}

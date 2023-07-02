@@ -15,7 +15,7 @@ import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
 
 const flowRate = "2";
 
-export function Subscriptions({
+export function SubscriptionActions({
   tba,
   profile,
   subscriptions,

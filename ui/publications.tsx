@@ -2,14 +2,16 @@ import { gql } from "@apollo/client";
 import {
   type Post,
   type ProfileId,
+  useActiveProfile,
   useApolloClient,
 } from "@lens-protocol/react-web";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getPublicationsQuery } from "@/lib/api";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { prepareSig } from "@/lib/lit";
 
+import { CreatePost } from "./create-post";
 import { Publication } from "./publication";
 
 export function Publications({
@@ -22,44 +24,55 @@ export function Publications({
   const [publications, setPublications] = useState<Post[]>([]);
   const [sigReady, setSigReady] = useState(false);
   const { query } = useApolloClient();
+  const { data: activeProfile } = useActiveProfile();
+
+  const fetchPublications = useCallback(async () => {
+    console.log("fetching publications");
+    const response = await query({
+      query: gql(getPublicationsQuery),
+      fetchPolicy: "no-cache",
+      variables: {
+        profileId,
+      },
+    });
+    setPublications(response.data.publications.items);
+  }, [query, profileId]);
 
   useEffect(() => {
-    const fetchPublications = async () => {
-      const response = await query({
-        query: gql(getPublicationsQuery),
-        fetchPolicy: "no-cache",
-        variables: {
-          profileId,
-        },
-      });
-      setPublications(response.data.publications.items);
-    };
-
     if (profileId && tba != ZERO_ADDRESS) {
       fetchPublications();
     }
-  }, [profileId, tba, query]);
+  }, [profileId, tba, query, fetchPublications]);
 
   useEffect(() => {
     prepareSig().then(() => setSigReady(true));
   }, []);
 
   return (
-    <div className="space-y-5">
-      {publications.length > 0 ? (
-        publications?.map((publication) => (
-          <Publication
-            key={publication.id}
-            publication={publication}
-            tba={tba}
-            sigReady={sigReady}
-          />
-        ))
-      ) : (
-        <div className="relative rounded-lg border border-primary p-5 text-sm">
-          No posts yet 😔
-        </div>
+    <>
+      {activeProfile && activeProfile.id === profileId && (
+        <CreatePost
+          publisher={activeProfile}
+          tba={tba}
+          fetchPublications={fetchPublications}
+        />
       )}
-    </div>
+      <div className="space-y-5">
+        {publications.length > 0 ? (
+          publications?.map((publication) => (
+            <Publication
+              key={publication.id}
+              publication={publication}
+              tba={tba}
+              sigReady={sigReady}
+            />
+          ))
+        ) : (
+          <div className="relative rounded-lg border border-primary p-5 text-sm">
+            No posts yet 😔
+          </div>
+        )}
+      </div>
+    </>
   );
 }

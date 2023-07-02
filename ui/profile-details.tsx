@@ -7,7 +7,7 @@ import { LENSTER_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { getBaseProfileHandle, getProfileName } from "@/lib/get-profile-info";
 
-import { Subscriptions } from "./subscriptions";
+import { SubscriptionActions } from "./subscription-actions";
 import { TbaDetails } from "./tba-details";
 
 export function ProfileDetails({
@@ -26,44 +26,58 @@ export function ProfileDetails({
   accountCreated: () => void;
 }) {
   return (
-    <div className="space-y-3">
-      <Image
-        src={getAvatar(profile)}
-        alt={profile.handle}
-        width={200}
-        height={200}
-        priority
-        className="rounded-lg object-cover"
-      />
-      <Subscriptions
-        tba={tba}
-        profile={profile}
-        subscriptions={subscriptions}
-      />
+    <div className="flex md:block md:space-y-3">
       <div>
-        <div className="font-semibold text-primary">
-          {getProfileName(profile)}
+        <div className="relative h-28 w-28 md:hidden">
+          <Image
+            src={getAvatar(profile)}
+            alt={profile.handle}
+            priority
+            fill
+            sizes="(max-width: 112px) 100vw"
+            className="rounded-lg object-cover"
+          />
         </div>
-        <div className="-mt-1">
-          <a
-            className="mt-1 flex items-center gap-1 text-gray-500 hover:underline"
-            href={`${LENSTER_URL}u/${getBaseProfileHandle(profile)}`}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            {profile.handle}
-            <ArrowSquareOut />
-          </a>
+        <Image
+          src={getAvatar(profile)}
+          alt={profile.handle}
+          width={200}
+          height={200}
+          priority
+          className="hidden rounded-lg object-cover md:block"
+        />
+      </div>
+      <div className="space-y-3 px-5 md:px-0">
+        <SubscriptionActions
+          tba={tba}
+          profile={profile}
+          subscriptions={subscriptions}
+        />
+        <div>
+          <div className="font-semibold text-primary">
+            {getProfileName(profile)}
+          </div>
+          <div className="-mt-1">
+            <a
+              className="mt-1 flex items-center gap-1 text-gray-500 hover:underline"
+              href={`${LENSTER_URL}u/${getBaseProfileHandle(profile)}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {profile.handle}
+              <ArrowSquareOut />
+            </a>
+          </div>
         </div>
         <div className="mt-2 text-xs">{profile.bio}</div>
+        <TbaDetails
+          profile={profile}
+          tba={tba}
+          tbaDeployed={tbaDeployed}
+          tokenId={tokenId}
+          accountCreated={accountCreated}
+        />
       </div>
-      <TbaDetails
-        profile={profile}
-        tba={tba}
-        tbaDeployed={tbaDeployed}
-        tokenId={tokenId}
-        accountCreated={accountCreated}
-      />
     </div>
   );
 }
