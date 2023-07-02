@@ -119,7 +119,7 @@ export function SubscriptionActions({
               productDetails={{
                 name: "m0saic",
                 description: "Lens subscriptions",
-                imageURI: "https://testnet.m0saic.xyz/logo_small.png",
+                imageURI: "https://testnet.m0saic.xyz/logo_sf.png",
               }}
               paymentDetails={{
                 paymentOptions: [

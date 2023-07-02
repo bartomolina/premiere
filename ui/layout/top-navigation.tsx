@@ -1,4 +1,4 @@
-import { GithubLogo, List,TwitterLogo } from "@phosphor-icons/react";
+import { GithubLogo, List, TwitterLogo } from "@phosphor-icons/react";
 
 import { navigation } from "@/lib/navigation";
 import { ThemeChanger } from "@/ui/layout/theme-changer";
@@ -18,15 +18,15 @@ export function TopNavigation() {
         >
           <List size={25} />
         </label>
-        <div className="hidden items-center md:flex">
+        <div className="items-center">
           <Logo />
         </div>
       </div>
-      <div className="flex items-center md:col-span-2">
+      <div className="md:ml-0 sm:ml-3 ml-0 flex items-center md:col-span-2">
         <ProfileSearch />
       </div>
-      <div className="flex w-full items-center justify-end gap-4 md:col-span-2">
-        <nav className="navbar pl-8">
+      <div className="flex w-full items-center justify-end md:gap-4 gap-1 md:col-span-2">
+        <nav className="navbar">
           {navigation.map((section) => (
             <ul key={section.name} className="menu menu-horizontal gap-5">
               {section.items.map((item) => (
