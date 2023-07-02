@@ -4,14 +4,22 @@ import {
   useActiveWallet,
 } from "@lens-protocol/react-web";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
-import { ethers } from "ethers";
-import { useState } from "react";
+import { ethers, providers } from "ethers";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
-import { SUPERFLUID_TOKEN } from "@/lib/constants";
-import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
+import {
+  ALCHEMY_API_KEY,
+  SUPERFLUID_TOKEN,
+  SUPERFLUID_TOKEN_ADDRESS,
+} from "@/lib/constants";
+import { wagmiNetwork } from "@/lib/wagmi-client";
+
+import SuperfluidWidget from "@superfluid-finance/widget";
+import superTokenList from "@superfluid-finance/tokenlist";
+import { getWalletClient } from "wagmi/actions";
 
 const flowRate = "2";
 
@@ -34,31 +42,17 @@ export function SubscriptionActions({
   const { data: activeProfile } = useActiveProfile();
 
   const getSFContext = async () => {
-    if (isConnected) {
-      await disconnectAsync();
-    }
-    let connector;
-    try {
-      ({ connector } = await connectAsync());
-    } catch (error) {
-      toast.error("Error connecting to wallet");
-      console.error(error);
-    }
+    const client = await getWalletClient();
 
-    if (connector instanceof InjectedConnector) {
-      const signer = await connector.getSigner();
+    const sf = await Framework.create({
+      chainId: wagmiNetwork.id,
+      provider: new providers.AlchemyProvider(wagmiNetwork.id, ALCHEMY_API_KEY),
+    });
 
-      const sf = await Framework.create({
-        chainId: wagmiNetwork.id,
-        provider: wagmiClient.provider,
-      });
+    const superSigner = sf.createSigner({ client });
+    const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
 
-      const superSigner = sf.createSigner({ signer });
-      const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
-
-      return { superSigner, daix };
-    }
-    return;
+    return { superSigner, daix };
   };
 
   const createStream = async () => {
@@ -114,13 +108,24 @@ export function SubscriptionActions({
     }
   };
 
+  const walletManager = useMemo(
+    () => ({
+      open: () => {
+        console.log();
+        alert("ello");
+      },
+      isOpen: false,
+    }),
+    []
+  );
+
   return (
     <>
       {subscriptions.some(
         (subscription) =>
           subscription.currentFlowRate != "0" &&
           subscription.sender.toLowerCase() === wallet?.address.toLowerCase()
-      ) ? (
+      ) && false ? (
         <button
           disabled={isLoading}
           onClick={deleteStream}
@@ -129,13 +134,52 @@ export function SubscriptionActions({
           Unsubscribe
         </button>
       ) : (
-        <button
-          disabled={!wallet || isLoading || profile.id === activeProfile?.id}
-          onClick={createStream}
-          className="btn-primary btn-sm btn w-full normal-case"
-        >
-          {wallet ? `🌟 ${flowRate} DAI / month` : "Connect to subscribe"}
-        </button>
+        <>
+          {wallet || true ? (
+            <SuperfluidWidget
+              productDetails={{
+                name: "m0saic",
+                description: "Lens subscriptions",
+                imageURI: "",
+              }}
+              paymentDetails={{
+                paymentOptions: [
+                  {
+                    receiverAddress: tba,
+                    superToken: {
+                      address: SUPERFLUID_TOKEN_ADDRESS,
+                    },
+                    chainId: 80001,
+                    flowRate: {
+                      amountEther: "0", //flowRate,
+                      period: "month",
+                    },
+                  },
+                ],
+              }}
+              tokenList={superTokenList}
+              type="drawer"
+              walletManager={walletManager}
+            >
+              {({ openModal }) => (
+                <button
+                  // disabled={!wallet || profile.id === activeProfile?.id}
+                  className="btn-primary btn-sm btn w-full normal-case"
+                  onClick={() => openModal()}
+                >
+                  Subscribe
+                </button>
+              )}
+            </SuperfluidWidget>
+          ) : (
+            <button
+              disabled={true}
+              className="btn-primary btn-sm btn w-full normal-case"
+            >
+              Connect to subscribe
+            </button>
+          )}
+        </>
       )}
     </>
   );

@@ -21,6 +21,7 @@ import { truncateAddr } from "@/lib/truncate-address";
 import { wagmiNetwork } from "@/lib/wagmi-client";
 
 import { LensProfiles } from "./lens-profiles";
+import { getWalletClient } from "wagmi/actions";
 
 export function LensLogin() {
   const {
@@ -53,10 +54,8 @@ export function LensLogin() {
       console.error(error);
     }
 
-    if (connector instanceof InjectedConnector) {
-      const signer = await connector.getSigner();
-      await login(signer);
-    }
+    const client = await getWalletClient();
+    await login({ address: client?.account.address });
   };
 
   useEffect(() => {

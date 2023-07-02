@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 import { WagmiConfig } from "wagmi";
 
 import { lensConfig } from "@/lib/lens-config";
-import { wagmiClient } from "@/lib/wagmi-client";
+import { wagmiConfig } from "@/lib/wagmi-client";
 import { SideNav } from "@/ui/layout/side-navigation";
 import { TopNavigation } from "@/ui/layout/top-navigation";
 
@@ -18,7 +18,7 @@ export function Client({ children }: { children: React.ReactNode }) {
       <div className="drawer">
         <input id="drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content">
-          <WagmiConfig client={wagmiClient}>
+          <WagmiConfig config={wagmiConfig}>
             <LensProvider config={lensConfig}>
               <div className="px-3 lg:px-0">
                 <TopNavigation />

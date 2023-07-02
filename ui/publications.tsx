@@ -27,7 +27,6 @@ export function Publications({
   const { data: activeProfile } = useActiveProfile();
 
   const fetchPublications = useCallback(async () => {
-    console.log("fetching publications");
     const response = await query({
       query: gql(getPublicationsQuery),
       fetchPolicy: "no-cache",

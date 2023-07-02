@@ -5,14 +5,21 @@ import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { useAccount, useConnect, useDisconnect, useProvider } from "wagmi";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
-import { HANDLE_SUFFIX, LENS_HUB_ADDRESS, ZERO_ADDRESS } from "@/lib/constants";
-import { wagmiClient, wagmiNetwork } from "@/lib/wagmi-client";
+import {
+  ALCHEMY_API_KEY,
+  HANDLE_SUFFIX,
+  LENS_HUB_ADDRESS,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
+import { wagmiNetwork } from "@/lib/wagmi-client";
 import { ProfileDetails } from "@/ui/profile-details";
 import { Publications } from "@/ui/publications";
 import { Subscribers } from "@/ui/subscribers";
+import { providers } from "ethers";
+import { getWalletClient } from "wagmi/actions";
 
 export default function Page({ params }: { params: { handle: string } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
@@ -26,7 +33,10 @@ export default function Page({ params }: { params: { handle: string } }) {
     connector: new InjectedConnector(),
   });
   const { disconnectAsync } = useDisconnect();
-  const provider = useProvider();
+  const provider = useMemo(
+    () => new providers.AlchemyProvider(wagmiNetwork.id, ALCHEMY_API_KEY),
+    []
+  );
 
   const tokenId = useMemo(() => {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
@@ -35,7 +45,7 @@ export default function Page({ params }: { params: { handle: string } }) {
   const fetchStreams = useCallback(async () => {
     const sf = await Framework.create({
       chainId: wagmiNetwork.id,
-      provider: wagmiClient.provider,
+      provider,
     });
 
     const pageResult = await sf.query.listStreams(
@@ -54,34 +64,21 @@ export default function Page({ params }: { params: { handle: string } }) {
 
   const fetchTBAAddress = useCallback(async () => {
     if (tokenId && provider) {
-      if (isConnected) {
-        await disconnectAsync();
-      }
-      let connector;
-      try {
-        ({ connector } = await connectAsync());
-      } catch (error) {
-        toast.error("Error connecting to wallet");
-        console.error(error);
-      }
-
-      if (connector instanceof InjectedConnector) {
-        const signer = await connector.getSigner();
-        const tokenboundClient = new TokenboundClient({
-          signer,
-          chainId: wagmiNetwork.id,
-        });
-        const address = tokenboundClient.getAccount({
-          tokenContract: LENS_HUB_ADDRESS,
-          tokenId,
-        });
-        setTba(address);
-        const code = await provider.getCode(address);
-        if (code === "0x") {
-          setTbaDeployed(false);
-        } else {
-          setTbaDeployed(true);
-        }
+      const client = await getWalletClient();
+      const tokenboundClient = new TokenboundClient({
+        client,
+        chainId: wagmiNetwork.id,
+      });
+      const address = tokenboundClient.getAccount({
+        tokenContract: LENS_HUB_ADDRESS,
+        tokenId,
+      });
+      setTba(address);
+      const code = await provider.getCode(address);
+      if (code === "0x") {
+        setTbaDeployed(false);
+      } else {
+        setTbaDeployed(true);
       }
     }
   }, [tokenId, provider]);

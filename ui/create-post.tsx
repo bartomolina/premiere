@@ -22,6 +22,7 @@ import { createPostQuery } from "@/lib/api";
 import { upload } from "@/lib/bundlr";
 import { APP_ID, LENS_HUB_ADDRESS } from "@/lib/constants";
 import { encrypt } from "@/lib/lit";
+import { getWalletClient } from "wagmi/actions";
 
 interface IFormInput {
   post: string;
@@ -107,7 +108,7 @@ export function CreatePost({
     }
 
     if (connector instanceof InjectedConnector) {
-      const signer = await connector.getSigner();
+      const client = await getWalletClient();
       const contentURI = await upload(postData);
 
       const typedResult = await mutate({
@@ -120,7 +121,7 @@ export function CreatePost({
 
       const typedData = typedResult.data.createPostTypedData.typedData;
       const lensHub = new ethers.Contract(LENS_HUB_ADDRESS, LensHubAbi, signer);
-      const signature = await signer._signTypedData(
+      const signature = await client._signTypedData(
         omitDeep(typedData.domain, "__typename"),
         omitDeep(typedData.types, "__typename"),
         omitDeep(typedData.value, "__typename")

@@ -13,6 +13,7 @@ import {
   SUPERFLUID_TOKEN_ADDRESS,
 } from "@/lib/constants";
 import { wagmiNetwork } from "@/lib/wagmi-client";
+import { getWalletClient } from "wagmi/actions";
 
 const iface = new Interface([
   "function transfer(address recipient, uint256 amount)",
@@ -43,50 +44,30 @@ export function CreateTba({
   });
   const { data: activeProfile } = useActiveProfile();
 
-  const getSigner = async () => {
-    if (isConnected) {
-      await disconnectAsync();
-    }
-    let connector;
-    try {
-      ({ connector } = await connectAsync());
-    } catch (error) {
-      toast.error("Error connecting to wallet");
-      console.error(error);
-    }
-
-    if (connector instanceof InjectedConnector) {
-      return await connector.getSigner();
-    }
-    return;
-  };
-
   const deployTBA = async () => {
     setLoading(true);
     if (tokenId) {
-      const signer = await getSigner();
-      if (signer) {
-        try {
-          const tokenboundClient = new TokenboundClient({
-            signer,
-            chainId: wagmiNetwork.id,
-          });
-          const tx = await tokenboundClient.createAccount({
-            tokenContract: LENS_HUB_ADDRESS,
-            tokenId,
-          });
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          await toast.promise(tx.wait(), {
-            pending: "Creating account",
-            success: "Account created",
-            error: "Error creating account",
-          });
-          accountCreated();
-        } catch (error) {
-          toast.error("Error creating account");
-          console.error(error);
-        }
+      const client = await getWalletClient();
+      try {
+        const tokenboundClient = new TokenboundClient({
+          client,
+          chainId: wagmiNetwork.id,
+        });
+        const tx = await tokenboundClient.createAccount({
+          tokenContract: LENS_HUB_ADDRESS,
+          tokenId,
+        });
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await toast.promise(tx.wait(), {
+          pending: "Creating account",
+          success: "Account created",
+          error: "Error creating account",
+        });
+        accountCreated();
+      } catch (error) {
+        toast.error("Error creating account");
+        console.error(error);
       }
     }
     setLoading(false);
@@ -95,11 +76,11 @@ export function CreateTba({
   const withdrawBalance = async () => {
     setLoading(true);
     if (tokenId) {
-      const signer = await getSigner();
-      if (signer && balance) {
+      const client = await getWalletClient();
+      if (balance) {
         try {
           const tokenboundClient = new TokenboundClient({
-            signer,
+            client,
             chainId: wagmiNetwork.id,
           });
           const calldata = iface.encodeFunctionData("transfer", [
@@ -112,8 +93,8 @@ export function CreateTba({
             value: BigInt(0),
             data: calldata,
           });
-          const tx = await signer.sendTransaction(preparedCall);
-          await toast.promise(tx.wait(), {
+          const tx = await client?.sendTransaction(preparedCall);
+          await toast.promise(tx?.wait(), {
             pending: "Transferring balance",
             success: "Balance tranferred",
             error: "Error transferring balance",
