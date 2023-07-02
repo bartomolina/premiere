@@ -21,7 +21,6 @@ import { truncateAddr } from "@/lib/truncate-address";
 import { wagmiNetwork } from "@/lib/wagmi-client";
 
 import { LensProfiles } from "./lens-profiles";
-import { getWalletClient } from "wagmi/actions";
 
 export function LensLogin() {
   const {
@@ -46,16 +45,13 @@ export function LensLogin() {
     if (isConnected) {
       await disconnectAsync();
     }
-    let connector;
     try {
-      ({ connector } = await connectAsync());
+      const connection = await connectAsync();
+      await login({ address: connection?.account });
     } catch (error) {
       toast.error("Error connecting to wallet");
       console.error(error);
     }
-
-    const client = await getWalletClient();
-    await login({ address: client?.account.address });
   };
 
   useEffect(() => {

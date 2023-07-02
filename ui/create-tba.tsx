@@ -1,23 +1,35 @@
 import { type Profile, useActiveProfile } from "@lens-protocol/react-web";
 import { TokenboundClient } from "@tokenbound/sdk";
+import { InjectedConnector, waitForTransaction } from "@wagmi/core";
 import { ethers } from "ethers";
-import { Interface } from "ethers/lib/utils.js";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
-import { useAccount, useBalance, useConnect, useDisconnect } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
+import { createWalletClient, custom, encodeFunctionData, http } from "viem";
+import {
+  useAccount,
+  useBalance,
+  useConnect,
+  useDisconnect,
+  type WindowProvider,
+} from "wagmi";
 
 import {
   LENS_HUB_ADDRESS,
   SUPERFLUID_TOKEN,
   SUPERFLUID_TOKEN_ADDRESS,
+  WALLET_NETWORK,
 } from "@/lib/constants";
-import { wagmiNetwork } from "@/lib/wagmi-client";
-import { getWalletClient } from "wagmi/actions";
 
-const iface = new Interface([
-  "function transfer(address recipient, uint256 amount)",
-]);
+const transferAbi = {
+  inputs: [
+    { name: "recipient", type: "address" },
+    { name: "amount", type: "uint256" },
+  ],
+  name: "transfer",
+  outputs: [{ name: "", type: "bool" }],
+  stateMutability: "nonpayable",
+  type: "function",
+};
 
 export function CreateTba({
   tbaDeployed,
@@ -33,41 +45,68 @@ export function CreateTba({
   accountCreated: () => void;
 }) {
   const [loading, setLoading] = useState(false);
-  const { isConnected } = useAccount();
-  const { connectAsync } = useConnect({
-    connector: new InjectedConnector(),
-  });
-  const { disconnectAsync } = useDisconnect();
+  const [balanceTransferred, setBalanceTransferred] = useState(false);
   const { data: balance } = useBalance({
     address: tba,
     token: SUPERFLUID_TOKEN_ADDRESS,
   });
   const { data: activeProfile } = useActiveProfile();
+  const { isConnected } = useAccount();
+  const { connectAsync } = useConnect({
+    connector: new InjectedConnector(),
+  });
+  const { disconnectAsync } = useDisconnect();
+
+  const ensureConnection = useCallback(async () => {
+    if (isConnected) {
+      await disconnectAsync();
+    }
+    try {
+      const connection = await connectAsync();
+
+      const walletClient = createWalletClient({
+        chain: WALLET_NETWORK,
+        account: connection?.account,
+        transport: window.ethereum
+          ? custom(window.ethereum as WindowProvider)
+          : http(),
+      });
+
+      return {
+        walletClient,
+        tokenboundClient: new TokenboundClient({
+          walletClient,
+          chainId: walletClient.chain.id,
+        }),
+      };
+    } catch (error) {
+      toast.error("Error connecting to wallet");
+      console.error(error);
+    }
+    return {};
+  }, []);
 
   const deployTBA = async () => {
     setLoading(true);
     if (tokenId) {
-      const client = await getWalletClient();
-      try {
-        const tokenboundClient = new TokenboundClient({
-          client,
-          chainId: wagmiNetwork.id,
-        });
-        const tx = await tokenboundClient.createAccount({
-          tokenContract: LENS_HUB_ADDRESS,
-          tokenId,
-        });
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await toast.promise(tx.wait(), {
-          pending: "Creating account",
-          success: "Account created",
-          error: "Error creating account",
-        });
-        accountCreated();
-      } catch (error) {
-        toast.error("Error creating account");
-        console.error(error);
+      const { tokenboundClient } = await ensureConnection();
+      if (tokenboundClient) {
+        try {
+          const hash = await tokenboundClient.createAccount({
+            tokenContract: LENS_HUB_ADDRESS,
+            tokenId,
+          });
+
+          await toast.promise(waitForTransaction({ hash }), {
+            pending: "Creating account",
+            success: "Account created",
+            error: "Error creating account",
+          });
+          accountCreated();
+        } catch (error) {
+          toast.error("Error creating account");
+          console.error(error);
+        }
       }
     }
     setLoading(false);
@@ -75,30 +114,31 @@ export function CreateTba({
 
   const withdrawBalance = async () => {
     setLoading(true);
-    if (tokenId) {
-      const client = await getWalletClient();
-      if (balance) {
+    if (balance) {
+      const { walletClient, tokenboundClient } = await ensureConnection();
+      if (walletClient && tokenboundClient) {
         try {
-          const tokenboundClient = new TokenboundClient({
-            client,
-            chainId: wagmiNetwork.id,
+          const calldata = encodeFunctionData({
+            abi: [transferAbi],
+            functionName: "transfer",
+            args: [profile.ownedBy, ethers.utils.parseEther(balance.formatted)],
           });
-          const calldata = iface.encodeFunctionData("transfer", [
-            profile.ownedBy,
-            ethers.utils.parseEther(balance.formatted),
-          ]);
+
           const preparedCall = await tokenboundClient.prepareExecuteCall({
             account: tba,
             to: SUPERFLUID_TOKEN_ADDRESS,
             value: BigInt(0),
             data: calldata,
           });
-          const tx = await client?.sendTransaction(preparedCall);
-          await toast.promise(tx?.wait(), {
+
+          const hash = await walletClient.sendTransaction(preparedCall);
+
+          await toast.promise(waitForTransaction({ hash }), {
             pending: "Transferring balance",
             success: "Balance tranferred",
             error: "Error transferring balance",
           });
+          setBalanceTransferred(true);
         } catch (error) {
           toast.error("Error transferring balance");
           console.error(error);
@@ -114,13 +154,16 @@ export function CreateTba({
         <>
           {profile.id === activeProfile?.id && (
             <button
+              disabled={balance?.value === BigInt(0) || balanceTransferred}
               onClick={withdrawBalance}
               className="btn-primary btn-sm btn w-full normal-case"
             >
-              {balance?.formatted &&
-                `Withdraw ${Number.parseFloat(balance?.formatted).toFixed(
-                  2
-                )} ${SUPERFLUID_TOKEN}`}
+              💰{" "}
+              {balanceTransferred
+                ? "0.00"
+                : balance?.formatted &&
+                  `${Number.parseFloat(balance?.formatted).toFixed(2)}`}{" "}
+              ${SUPERFLUID_TOKEN}
             </button>
           )}
         </>

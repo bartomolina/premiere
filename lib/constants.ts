@@ -1,4 +1,5 @@
 import { Network } from "alchemy-sdk";
+import { polygon, polygonMumbai } from "viem/chains";
 
 export const IPFS_GATEWAY = "https://gateway.ipfscdn.io/ipfs/";
 export const ARWEAVE_GATEWAY = "https://arweave.net/";
@@ -45,3 +46,9 @@ export const MOSAIC_LIT_ACC_CONTRACT =
     ? ""
     : "0xE64d6F5A6A6eaA1456B73eBf62E590e165D8Daac";
 export const APP_ID = "mosaic";
+export const LIGHT_THEME_PRIMARY = "#529b03";
+export const LIGHT_THEME_SECONDARY = "#e9e92f";
+export const DARK_THEME_PRIMARY = "#ff7ac6";
+export const DARK_THEME_SECONDARY = "#bf95f9";
+export const WALLET_NETWORK =
+  LENS_NETWORK === "mainnet" ? polygon : polygonMumbai;

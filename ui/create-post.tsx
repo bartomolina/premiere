@@ -5,7 +5,8 @@ import {
   useApolloClient,
 } from "@lens-protocol/react-web";
 import { MetadataV2, PublicationMainFocus } from "@lens-protocol/sdk-gated";
-import { ethers, utils } from "ethers";
+import { signTypedData, waitForTransaction, writeContract } from "@wagmi/core";
+import { utils } from "ethers";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -17,12 +18,11 @@ import { v4 as uuidv4 } from "uuid";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
-import LensHubAbi from "@/lib/abi/lens-hub-contract-abi.json";
+import { lensHubAbi } from "@/lib/abi/lens-hub-contract-abi";
 import { createPostQuery } from "@/lib/api";
 import { upload } from "@/lib/bundlr";
 import { APP_ID, LENS_HUB_ADDRESS } from "@/lib/constants";
 import { encrypt } from "@/lib/lit";
-import { getWalletClient } from "wagmi/actions";
 
 interface IFormInput {
   post: string;
@@ -96,62 +96,70 @@ export function CreatePost({
       },
     };
 
-    let connector;
     if (isConnected) {
       await disconnectAsync();
     }
     try {
-      ({ connector } = await connectAsync());
+      await connectAsync();
     } catch (error) {
       toast.error("Error connecting to wallet");
       console.error(error);
     }
 
-    if (connector instanceof InjectedConnector) {
-      const client = await getWalletClient();
-      const contentURI = await upload(postData);
+    const contentURI = await upload(postData);
 
-      const typedResult = await mutate({
-        mutation: gql(createPostQuery),
-        variables: {
-          profileId: publisher.id,
-          url: contentURI,
+    const typedResult = await mutate({
+      mutation: gql(createPostQuery),
+      variables: {
+        profileId: publisher.id,
+        url: contentURI,
+      },
+    });
+
+    const typedData = typedResult.data.createPostTypedData.typedData;
+
+    const signature = await signTypedData({
+      primaryType: "PostWithSig",
+      domain: omitDeep(typedData.domain, "__typename"),
+      types: omitDeep(typedData.types, "__typename"),
+      message: omitDeep(typedData.value, "__typename"),
+    });
+    const { v, r, s } = utils.splitSignature(signature) as {
+      v: number;
+      r: `0x${string}`;
+      s: `0x${string}`;
+    };
+
+    const { hash } = await writeContract({
+      address: LENS_HUB_ADDRESS,
+      functionName: "postWithSig",
+      abi: lensHubAbi,
+      args: [
+        {
+          profileId: typedData.value.profileId,
+          contentURI: typedData.value.contentURI,
+          collectModule: typedData.value.collectModule,
+          collectModuleInitData: typedData.value.collectModuleInitData,
+          referenceModule: typedData.value.referenceModule,
+          referenceModuleInitData: typedData.value.referenceModuleInitData,
+          sig: {
+            v,
+            r,
+            s,
+            deadline: typedData.value.deadline,
+          },
         },
-      });
+      ],
+    });
 
-      const typedData = typedResult.data.createPostTypedData.typedData;
-      const lensHub = new ethers.Contract(LENS_HUB_ADDRESS, LensHubAbi, signer);
-      const signature = await client._signTypedData(
-        omitDeep(typedData.domain, "__typename"),
-        omitDeep(typedData.types, "__typename"),
-        omitDeep(typedData.value, "__typename")
-      );
-      const { v, r, s } = utils.splitSignature(signature);
+    await toast.promise(waitForTransaction({ hash }), {
+      pending: "Posting",
+      success: "Post published",
+      error: "Error posting",
+    });
 
-      const tx = await lensHub.postWithSig({
-        profileId: typedData.value.profileId,
-        contentURI: typedData.value.contentURI,
-        collectModule: typedData.value.collectModule,
-        collectModuleInitData: typedData.value.collectModuleInitData,
-        referenceModule: typedData.value.referenceModule,
-        referenceModuleInitData: typedData.value.referenceModuleInitData,
-        sig: {
-          v,
-          r,
-          s,
-          deadline: typedData.value.deadline,
-        },
-      });
-
-      await toast.promise(tx.wait(), {
-        pending: "Posting",
-        success: "Post published",
-        error: "Error posting",
-      });
-
-      fetchPublications();
-      reset();
-    }
+    fetchPublications();
+    reset();
   };
 
   return (
@@ -166,7 +174,6 @@ export function CreatePost({
           name="post"
           id="post"
           className="textarea-bordered textarea-primary textarea textarea-md w-full text-sm focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
-          defaultValue={""}
         />
       </div>
       <span className="text-sm text-error">

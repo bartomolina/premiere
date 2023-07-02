@@ -4,22 +4,26 @@ import {
   useActiveWallet,
 } from "@lens-protocol/react-web";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
-import { ethers, providers } from "ethers";
-import { useMemo, useState } from "react";
+import superTokenList from "@superfluid-finance/tokenlist";
+import SuperfluidWidget from "@superfluid-finance/widget";
+import { getWalletClient } from "@wagmi/core";
+import { providers } from "ethers";
+import { useTheme } from "next-themes";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
 import {
   ALCHEMY_API_KEY,
+  DARK_THEME_PRIMARY,
+  DARK_THEME_SECONDARY,
+  LIGHT_THEME_PRIMARY,
+  LIGHT_THEME_SECONDARY,
   SUPERFLUID_TOKEN,
   SUPERFLUID_TOKEN_ADDRESS,
 } from "@/lib/constants";
 import { wagmiNetwork } from "@/lib/wagmi-client";
-
-import SuperfluidWidget from "@superfluid-finance/widget";
-import superTokenList from "@superfluid-finance/tokenlist";
-import { getWalletClient } from "wagmi/actions";
 
 const flowRate = "2";
 
@@ -40,6 +44,7 @@ export function SubscriptionActions({
   });
   const { disconnectAsync } = useDisconnect();
   const { data: activeProfile } = useActiveProfile();
+  const { theme } = useTheme();
 
   const getSFContext = async () => {
     const client = await getWalletClient();
@@ -49,41 +54,12 @@ export function SubscriptionActions({
       provider: new providers.AlchemyProvider(wagmiNetwork.id, ALCHEMY_API_KEY),
     });
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const superSigner = sf.createSigner({ client });
     const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
 
     return { superSigner, daix };
-  };
-
-  const createStream = async () => {
-    setIsLoading(true);
-    const sfContext = await getSFContext();
-    if (sfContext) {
-      const { superSigner, daix } = sfContext;
-      try {
-        const createFlowOperation = daix.createFlow({
-          sender: await superSigner.getAddress(),
-          receiver: tba,
-          flowRate: ethers.utils
-            .parseEther(
-              (Number.parseInt(flowRate) / (60 * 60 * 24 * 30))
-                .toFixed(18)
-                .toString()
-            )
-            .toString(),
-        });
-
-        await createFlowOperation.exec(superSigner);
-        toast.success(
-          "Stream created. It may take a few minutes until it's reflected in the dashboard"
-        );
-      } catch (error) {
-        toast.error(
-          "Error creating stream: Make sure that you have enough Superfluid DAIx and that you don't have a stream already open with this profile"
-        );
-        console.error(error);
-      }
-    }
   };
 
   const deleteStream = async () => {
@@ -108,16 +84,19 @@ export function SubscriptionActions({
     }
   };
 
-  const walletManager = useMemo(
-    () => ({
-      open: () => {
-        console.log();
-        alert("ello");
-      },
-      isOpen: false,
-    }),
-    []
-  );
+  const sfModal = async (openModal: () => void) => {
+    if (isConnected) {
+      await disconnectAsync();
+    }
+    try {
+      await connectAsync();
+    } catch (error) {
+      toast.error("Error connecting to wallet");
+      console.error(error);
+    }
+
+    openModal();
+  };
 
   return (
     <>
@@ -140,7 +119,7 @@ export function SubscriptionActions({
               productDetails={{
                 name: "m0saic",
                 description: "Lens subscriptions",
-                imageURI: "",
+                imageURI: "https://testnet.m0saic.xyz/logo_small.png",
               }}
               paymentDetails={{
                 paymentOptions: [
@@ -149,9 +128,9 @@ export function SubscriptionActions({
                     superToken: {
                       address: SUPERFLUID_TOKEN_ADDRESS,
                     },
-                    chainId: 80001,
+                    chainId: wagmiNetwork.id,
                     flowRate: {
-                      amountEther: "0", //flowRate,
+                      amountEther: flowRate,
                       period: "month",
                     },
                   },
@@ -159,13 +138,34 @@ export function SubscriptionActions({
               }}
               tokenList={superTokenList}
               type="drawer"
-              walletManager={walletManager}
+              theme={{
+                palette: {
+                  mode: theme === "light" ? "light" : "dark",
+                  primary: {
+                    main:
+                      theme === "light"
+                        ? LIGHT_THEME_PRIMARY
+                        : DARK_THEME_PRIMARY,
+                  },
+                  secondary: {
+                    main:
+                      theme === "light"
+                        ? LIGHT_THEME_SECONDARY
+                        : DARK_THEME_SECONDARY,
+                  },
+                },
+              }}
+              walletManager={{
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
+                open: () => {},
+                isOpen: false,
+              }}
             >
               {({ openModal }) => (
                 <button
-                  // disabled={!wallet || profile.id === activeProfile?.id}
+                  disabled={!wallet || profile.id === activeProfile?.id}
                   className="btn-primary btn-sm btn w-full normal-case"
-                  onClick={() => openModal()}
+                  onClick={() => sfModal(openModal)}
                 >
                   Subscribe
                 </button>

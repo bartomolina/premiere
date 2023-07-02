@@ -3,10 +3,8 @@
 import { useProfile } from "@lens-protocol/react-web";
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import { TokenboundClient } from "@tokenbound/sdk";
+import { providers } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 
 import {
   ALCHEMY_API_KEY,
@@ -18,8 +16,11 @@ import { wagmiNetwork } from "@/lib/wagmi-client";
 import { ProfileDetails } from "@/ui/profile-details";
 import { Publications } from "@/ui/publications";
 import { Subscribers } from "@/ui/subscribers";
-import { providers } from "ethers";
-import { getWalletClient } from "wagmi/actions";
+
+const provider = new providers.AlchemyProvider(
+  wagmiNetwork.id,
+  ALCHEMY_API_KEY
+);
 
 export default function Page({ params }: { params: { handle: string } }) {
   const [tba, setTba] = useState<`0x${string}`>(ZERO_ADDRESS);
@@ -28,15 +29,6 @@ export default function Page({ params }: { params: { handle: string } }) {
   const { data: profile, loading: profileLoading } = useProfile({
     handle: `${params.handle}${HANDLE_SUFFIX}`,
   });
-  const { isConnected } = useAccount();
-  const { connectAsync } = useConnect({
-    connector: new InjectedConnector(),
-  });
-  const { disconnectAsync } = useDisconnect();
-  const provider = useMemo(
-    () => new providers.AlchemyProvider(wagmiNetwork.id, ALCHEMY_API_KEY),
-    []
-  );
 
   const tokenId = useMemo(() => {
     return profile?.id ? Number.parseInt(profile.id, 16).toString() : undefined;
@@ -64,9 +56,7 @@ export default function Page({ params }: { params: { handle: string } }) {
 
   const fetchTBAAddress = useCallback(async () => {
     if (tokenId && provider) {
-      const client = await getWalletClient();
       const tokenboundClient = new TokenboundClient({
-        client,
         chainId: wagmiNetwork.id,
       });
       const address = tokenboundClient.getAccount({
@@ -81,7 +71,7 @@ export default function Page({ params }: { params: { handle: string } }) {
         setTbaDeployed(true);
       }
     }
-  }, [tokenId, provider]);
+  }, [tokenId]);
 
   useEffect(() => {
     fetchTBAAddress();
@@ -112,7 +102,7 @@ export default function Page({ params }: { params: { handle: string } }) {
           <Publications profileId={profile.id} tba={tba} />
         </div>
       </div>
-      <div className="">
+      <div>
         <Subscribers subscriptions={subscriptions} tba={tba} />
       </div>
     </div>
