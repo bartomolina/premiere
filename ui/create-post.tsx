@@ -6,7 +6,7 @@ import {
 } from "@lens-protocol/react-web";
 import { MetadataV2, PublicationMainFocus } from "@lens-protocol/sdk-gated";
 import { signTypedData, waitForTransaction, writeContract } from "@wagmi/core";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -21,11 +21,13 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { lensHubAbi } from "@/lib/abi/lens-hub-contract-abi";
 import { createPostQuery } from "@/lib/api";
 import { upload } from "@/lib/bundlr";
-import { APP_ID, LENS_HUB_ADDRESS } from "@/lib/constants";
+import { APP_ID, LENS_HUB_ADDRESS, SUPERFLUID_TOKEN } from "@/lib/constants";
 import { encrypt } from "@/lib/lit";
 
 interface IFormInput {
   post: string;
+  minFlowRate: string;
+  maxTimestamp: string;
 }
 
 export function CreatePost({
@@ -51,10 +53,23 @@ export function CreatePost({
   const { mutate } = useApolloClient();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    const _minFlowRate = Math.round(
+      Number(ethers.utils.parseEther(data.minFlowRate)._hex) /
+        (60 * 60 * 24 * 30)
+    ).toString();
+
+    const _maxTimestamp = data.maxTimestamp
+      ? Math.round(
+          new Date().setDate(new Date().getDate() - 7) / 1000
+        ).toString()
+      : "";
+
     const { encryptedString, encryptedSymmetricKey } = await encrypt(
       data.post,
       tba,
-      Number.parseInt(publisher.id, 16).toString()
+      Number.parseInt(publisher.id, 16).toString(),
+      _minFlowRate,
+      _maxTimestamp
     );
 
     const postData: MetadataV2 = {
@@ -65,7 +80,22 @@ export function CreatePost({
       mainContentFocus: PublicationMainFocus.TextOnly,
       description: "This publication is gated.",
       name: "This publication is gated.",
-      attributes: [],
+      attributes: [
+        {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          displayType: "string",
+          value: _minFlowRate,
+          traitType: "minFlowRate",
+        },
+        {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          displayType: "string",
+          value: _maxTimestamp,
+          traitType: "maxTimestamp",
+        },
+      ],
       appId: appId(APP_ID),
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -152,7 +182,7 @@ export function CreatePost({
       ],
     });
 
-    await toast.promise(waitForTransaction({ hash }), {
+    await toast.promise(waitForTransaction({ hash, confirmations: 2 }), {
       pending: "Posting",
       success: "Post published",
       error: "Error posting",
@@ -163,8 +193,8 @@ export function CreatePost({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <label htmlFor="post" className="block text-sm font-medium">
+    <form onSubmit={handleSubmit(onSubmit)} className="mb-5 text-sm">
+      <label htmlFor="post" className="block font-medium">
         Create post
       </label>
       <div className="mt-2">
@@ -173,21 +203,54 @@ export function CreatePost({
           rows={4}
           name="post"
           id="post"
-          className="textarea-bordered textarea-primary textarea textarea-md w-full text-sm focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
+          className="textarea-bordered textarea-primary textarea textarea-md w-full focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
         />
       </div>
-      <span className="text-sm text-error">
-        {errors.post && <p>Post is required.</p>}
-      </span>
-      <div className="mt-2 flex justify-end">
-        <button
-          disabled={!isValid || isSubmitting}
-          type="submit"
-          className="btn-primary btn-sm btn normal-case"
-        >
-          Post
-        </button>
+      <div className="mt-2 flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 font-medium">
+            <label htmlFor="minFlowRate" className="block">
+              Min.
+            </label>
+            <input
+              {...register("minFlowRate")}
+              type="text"
+              size={3}
+              defaultValue={2}
+              name="minFlowRate"
+              id="minFlowRate"
+              className="input-bordered input-primary input input-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
+            />{" "}
+            {SUPERFLUID_TOKEN} / mo.
+          </div>
+          <div className="flex items-center gap-2 font-medium">
+            <label htmlFor="maxTimestamp" className="block">
+              &ge; 1 week
+            </label>
+            <input
+              {...register("maxTimestamp")}
+              type="checkbox"
+              size={4}
+              defaultChecked={false}
+              name="maxTimestamp"
+              id="maxTimestamp"
+              className="checkbox-primary checkbox checkbox-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
+            />
+          </div>
+        </div>
+        <div className="ml-4">
+          <button
+            disabled={!isValid || isSubmitting}
+            type="submit"
+            className="btn-primary btn-sm btn normal-case"
+          >
+            Post
+          </button>
+        </div>
       </div>
+      <span className="flex justify-end text-error">
+        {errors.post && <p>Post is required</p>}
+      </span>
     </form>
   );
 }

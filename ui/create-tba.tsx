@@ -97,7 +97,7 @@ export function CreateTba({
             tokenId,
           });
 
-          await toast.promise(waitForTransaction({ hash }), {
+          await toast.promise(waitForTransaction({ hash, confirmations: 2 }), {
             pending: "Creating account",
             success: "Account created",
             error: "Error creating account",
@@ -133,7 +133,7 @@ export function CreateTba({
 
           const hash = await walletClient.sendTransaction(preparedCall);
 
-          await toast.promise(waitForTransaction({ hash }), {
+          await toast.promise(waitForTransaction({ hash, confirmations: 2 }), {
             pending: "Transferring balance",
             success: "Balance tranferred",
             error: "Error transferring balance",

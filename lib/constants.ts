@@ -44,7 +44,7 @@ export const CHAIN = LENS_NETWORK === "mainnet" ? "polygon" : "mumbai";
 export const MOSAIC_LIT_ACC_CONTRACT =
   LENS_NETWORK === "mainnet"
     ? ""
-    : "0xE64d6F5A6A6eaA1456B73eBf62E590e165D8Daac";
+    : "0xE4666A494238E6e397962ac749368629139ff363";
 export const APP_ID = "mosaic";
 export const LIGHT_THEME_PRIMARY = "#529b03";
 export const LIGHT_THEME_SECONDARY = "#e9e92f";

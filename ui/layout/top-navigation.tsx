@@ -22,10 +22,10 @@ export function TopNavigation() {
           <Logo />
         </div>
       </div>
-      <div className="md:ml-0 sm:ml-3 ml-0 flex items-center md:col-span-2">
+      <div className="ml-0 flex items-center sm:ml-3 md:col-span-2 md:ml-0">
         <ProfileSearch />
       </div>
-      <div className="flex w-full items-center justify-end md:gap-4 gap-1 md:col-span-2">
+      <div className="flex w-full items-center justify-end gap-1 md:col-span-2 md:gap-4">
         <nav className="navbar">
           {navigation.map((section) => (
             <ul key={section.name} className="menu menu-horizontal gap-5">

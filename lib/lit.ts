@@ -2,11 +2,22 @@ import * as LitJsSdk from "@lit-protocol/lit-node-client";
 
 import { CHAIN, MOSAIC_LIT_ACC_CONTRACT } from "./constants";
 
-const conditions = (address: string, profileId: string) => [
+const conditions = (
+  address: string,
+  profileId: string,
+  minFlowRate: string,
+  maxTimestamp: string
+) => [
   {
     contractAddress: MOSAIC_LIT_ACC_CONTRACT,
     functionName: "isSubscribed",
-    functionParams: [":userAddress", address, profileId],
+    functionParams: [
+      ":userAddress",
+      address,
+      profileId,
+      minFlowRate,
+      maxTimestamp,
+    ],
     functionAbi: {
       inputs: [
         {
@@ -22,6 +33,16 @@ const conditions = (address: string, profileId: string) => [
         {
           internalType: "string",
           name: "profileId",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "minFlowRate",
+          type: "string",
+        },
+        {
+          internalType: "string",
+          name: "maxTimestamp",
           type: "string",
         },
       ],
@@ -69,7 +90,9 @@ export const prepareSig = async () => {
 export const encrypt = async (
   content: string,
   address: string,
-  profileId: string
+  profileId: string,
+  minFlowRate: string,
+  maxTimestamp: string
 ) => {
   const client = new LitJsSdk.LitNodeClient({ debug: false });
   await client.connect();
@@ -85,7 +108,12 @@ export const encrypt = async (
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
-    evmContractConditions: conditions(address, profileId),
+    evmContractConditions: conditions(
+      address,
+      profileId,
+      minFlowRate,
+      maxTimestamp
+    ),
     symmetricKey,
     authSig,
     chain: CHAIN,
@@ -104,7 +132,9 @@ export const decrypt = async (
   content: string,
   encryptedSymmetricKey: string,
   address: string,
-  profileId: string
+  profileId: string,
+  minFlowRate: string,
+  maxTimestamp: string
 ) => {
   const fContent = await fetch(content);
   const encryptedBlob = await fContent.blob();
@@ -120,7 +150,12 @@ export const decrypt = async (
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const symmetricKey = await window.litNodeClient.getEncryptionKey({
-    evmContractConditions: conditions(address, profileId),
+    evmContractConditions: conditions(
+      address,
+      profileId,
+      minFlowRate,
+      maxTimestamp
+    ),
     toDecrypt: encryptedSymmetricKey,
     chain: CHAIN,
     authSig,

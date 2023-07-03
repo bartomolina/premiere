@@ -3,6 +3,7 @@ import {
   type Post,
   type ProfileId,
   useActiveProfile,
+  useActiveWallet,
   useApolloClient,
 } from "@lens-protocol/react-web";
 import { useCallback, useEffect, useState } from "react";
@@ -25,6 +26,7 @@ export function Publications({
   const [sigReady, setSigReady] = useState(false);
   const { query } = useApolloClient();
   const { data: activeProfile } = useActiveProfile();
+  const { data: wallet } = useActiveWallet();
 
   const fetchPublications = useCallback(async () => {
     const response = await query({
@@ -44,8 +46,10 @@ export function Publications({
   }, [profileId, tba, query, fetchPublications]);
 
   useEffect(() => {
-    prepareSig().then(() => setSigReady(true));
-  }, []);
+    if (wallet) {
+      prepareSig().then(() => setSigReady(true));
+    }
+  }, [wallet]);
 
   return (
     <>

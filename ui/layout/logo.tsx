@@ -15,7 +15,7 @@ export function Logo() {
       <Image
         src={"/logo_small.png"}
         alt="m0saic"
-        className="md:hidden sm:block hidden"
+        className="hidden sm:block md:hidden"
         priority
         width={75}
         height={75}

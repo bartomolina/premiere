@@ -4,7 +4,7 @@ import {
   type Post,
 } from "@lens-protocol/react-web";
 import { type MetadataV2 } from "@lens-protocol/sdk-gated";
-import { Lock, Star } from "@phosphor-icons/react";
+import { Star } from "@phosphor-icons/react";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -29,6 +29,8 @@ export function Publication({
   );
   const [unlocked, setUnlocked] = useState(false);
 
+  console.log(publication);
+
   useEffect(() => {
     if (sigReady) {
       const decryptPublication = async () => {
@@ -37,13 +39,27 @@ export function Publication({
         const encryptedSymmetricKey =
           publication.metadata.encryptionParams?.providerSpecificParams
             ?.encryptionKey;
-        if (encryptedContent && encryptedSymmetricKey) {
+        const minFlowRate = publication.metadata.attributes.find(
+          (attribute) => attribute.traitType === "minFlowRate"
+        )?.value;
+        const maxTimestamp = publication.metadata.attributes.find(
+          (attribute) => attribute.traitType === "maxTimestamp"
+        )?.value;
+        if (
+          encryptedContent &&
+          encryptedSymmetricKey &&
+          typeof minFlowRate === "string" &&
+          typeof maxTimestamp === "string"
+        ) {
+          console.log("checking...");
           try {
             const decryptedString = await decrypt(
               encryptedContent,
               encryptedSymmetricKey,
               tba,
-              Number.parseInt(publication.profile.id, 16).toString()
+              Number.parseInt(publication.profile.id, 16).toString(),
+              minFlowRate,
+              maxTimestamp
             );
 
             const newMetadata = publication.metadata;
@@ -69,31 +85,31 @@ export function Publication({
   }, [publication, tba, sigReady]);
 
   return (
-    <div className="  rounded-lg border border-primary text-sm">
-      {publication.isGated && (
-        <div className="flex w-full justify-end px-5 pt-3">
-          {unlocked ? (
-            <Star
-              width={15}
-              height={15}
-              weight="fill"
-              className="text-warning "
-            />
-          ) : (
-            <Lock
-              width={15}
-              height={15}
-              weight="fill"
-              className="text-error "
-            />
+    <>
+      {publication.isGated && !unlocked ? (
+        <div className="relative h-16 text-sm">
+          <div className="absolute h-full w-full rounded-lg border border-primary text-sm blur-sm"></div>
+          <div className="absolute z-10 p-5 ">🔒 Subscribers only</div>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-primary text-sm">
+          {unlocked && (
+            <div className="flex w-full justify-end px-5 pt-3">
+              <Star
+                width={15}
+                height={15}
+                weight="fill"
+                className="text-warning "
+              />
+            </div>
           )}
+          <div className="prose-sm prose m-5 overflow-hidden text-ellipsis">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {metadata.content}
+            </ReactMarkdown>
+          </div>
         </div>
       )}
-      <div className="prose-sm prose m-5 overflow-hidden text-ellipsis">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {metadata.content}
-        </ReactMarkdown>
-      </div>
-    </div>
+    </>
   );
 }

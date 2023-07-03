@@ -21,7 +21,9 @@ contract Mosaic {
     function isSubscribed(
         address sender,
         address receiver,
-        string memory profileId
+        string memory profileId,
+        string memory minFlowRate,
+        string memory maxTimestamp
     ) public view returns (bool subscribed) {
         subscribed = false;
 
@@ -29,14 +31,21 @@ contract Mosaic {
         IConstantFlowAgreementV1 _cfa = IConstantFlowAgreementV1(
             0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873
         );
-        (, int96 flowRate, , ) = _cfa.getFlow(
+        (uint256 timestamp, int96 flowRate, , ) = _cfa.getFlow(
             ISuperfluidToken(0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f),
             sender,
             receiver
         );
-        address _owner = _lensHub.ownerOf(parseInt(profileId));
+        address _owner = _lensHub.ownerOf(uint(parseInt(profileId)));
 
-        if (flowRate > 1 || sender == _owner) {
+        int256 _minFlowRate = int(parseInt(minFlowRate));
+        uint256 _maxTimestamp = parseInt(maxTimestamp);
+
+        if (
+            (flowRate > _minFlowRate &&
+                (_maxTimestamp == 0 || timestamp < _maxTimestamp)) ||
+            sender == _owner
+        ) {
             subscribed = true;
         }
     }

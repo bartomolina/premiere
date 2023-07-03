@@ -19,7 +19,7 @@ export function Subscribers({
   }, [subscriptions, tba]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="text-sm font-medium">Subscribers</div>
       {filteredSubscriptions.length > 0 ? (
         filteredSubscriptions.map((subscription) => (

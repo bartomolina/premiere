@@ -20,7 +20,7 @@ export function ProfileSearch() {
           value={query}
           onChange={(event_) => setQuery(event_.target.value)}
           tabIndex={0}
-          className="sm:w-auto w-24 input-bordered input-primary input input-sm pl-10 focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
+          className="input-bordered input-primary input input-sm w-24 pl-10 focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary sm:w-auto"
         />
         <ProfileSearchSuggestions query={query} setQuery={setQuery} />
       </div>
