@@ -44,11 +44,11 @@ export const CHAIN = LENS_NETWORK === "mainnet" ? "polygon" : "mumbai";
 export const MOSAIC_LIT_ACC_CONTRACT =
   LENS_NETWORK === "mainnet"
     ? ""
-    : "0xE4666A494238E6e397962ac749368629139ff363";
+    : "0xe1BEb28d045e7c9FEe3362792857bB22022fBb20";
 export const APP_ID = "mosaic";
 export const LIGHT_THEME_PRIMARY = "#529b03";
 export const LIGHT_THEME_SECONDARY = "#e9e92f";
-export const DARK_THEME_PRIMARY = "#ff7ac6";
-export const DARK_THEME_SECONDARY = "#bf95f9";
+export const DARK_THEME_PRIMARY = "#1c4f82";
+export const DARK_THEME_SECONDARY = "#7d919b";
 export const WALLET_NETWORK =
   LENS_NETWORK === "mainnet" ? polygon : polygonMumbai;

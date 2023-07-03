@@ -5,7 +5,7 @@ export function Logo() {
   return (
     <Link href={"/"}>
       <Image
-        src={"/premiere_logo.png"}
+        src={"/premiere-logo.png"}
         alt="Premiere"
         className="hidden p-3 md:block"
         priority
@@ -13,7 +13,7 @@ export function Logo() {
         height={150}
       />
       <Image
-        src={"/premiere_logo_small.png"}
+        src={"/premiere-logo-small.png"}
         alt="Premiere"
         className="hidden sm:block md:hidden"
         priority

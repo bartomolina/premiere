@@ -1,4 +1,4 @@
-import { type Profile } from "@lens-protocol/react-web";
+import { type Profile,useActiveProfile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 import { IStream } from "@superfluid-finance/sdk-core";
 import Image from "next/image";
@@ -27,6 +27,8 @@ export function ProfileDetails({
   tokenId: string | undefined;
   accountCreated: () => void;
 }) {
+  const { data: activeProfile } = useActiveProfile();
+
   return (
     <div className="flex md:block md:space-y-3">
       <div>
@@ -50,11 +52,13 @@ export function ProfileDetails({
         />
       </div>
       <div className="space-y-3 px-5 md:px-0">
-        <SubscriptionActions
-          tba={tba}
-          profile={profile}
-          subscriptions={subscriptions}
-        />
+        {profile.id !== activeProfile?.id && (
+          <SubscriptionActions
+            tba={tba}
+            profile={profile}
+            subscriptions={subscriptions}
+          />
+        )}
         <div>
           <div className="font-semibold text-primary">
             {getProfileName(profile)}

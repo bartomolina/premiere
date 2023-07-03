@@ -40,7 +40,7 @@ export function SubscriptionActions({
   subscriptions: IStream[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [flowRate, setFlowRate] = useState<`${number}`>("2");
+  const [flowRate, setFlowRate] = useState<`${number}`>("5");
   const { data: wallet } = useActiveWallet();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({
@@ -104,8 +104,8 @@ export function SubscriptionActions({
     openModal();
   };
 
-  const subscribed = useMemo(() => {
-    return subscriptions.some(
+  const ownSubscription = useMemo(() => {
+    return subscriptions.findLast(
       (subscription) =>
         subscription.currentFlowRate != "0" &&
         subscription.sender.toLowerCase() === wallet?.address.toLowerCase()
@@ -171,10 +171,15 @@ export function SubscriptionActions({
                   size={3}
                   value={flowRate}
                   onChange={(_event) => {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    if (!Number.isNaN(_event.target.value)) {
-                      setFlowRate(_event.target.value as `${number}`);
+                    const value = _event.target.value;
+                    if (Number.parseInt(value) || value === "") {
+                      value === ""
+                        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                          // @ts-ignore
+                          setFlowRate("")
+                        : setFlowRate(
+                            Number.parseInt(value).toString() as `${number}`
+                          );
                     }
                   }}
                   id="flowRate"
@@ -188,7 +193,7 @@ export function SubscriptionActions({
                   onClick={() => sfModal(openModal)}
                   className="btn-primary btn-sm btn w-full normal-case"
                 >
-                  {subscribed ? "Update" : "Subscribe"}
+                  {ownSubscription ? "Update" : "Subscribe"}
                 </button>
               </div>
             </div>
@@ -203,14 +208,21 @@ export function SubscriptionActions({
         </button>
       )}
 
-      {subscribed && (
-        <button
-          disabled={isLoading}
-          onClick={deleteStream}
-          className="btn-error btn-sm btn w-full normal-case"
-        >
-          Unsubscribe
-        </button>
+      {ownSubscription && (
+        <div className="space-y-1.5">
+          <span className="flex justify-center text-xs">
+            {`Since ${new Date(
+              ownSubscription.updatedAtTimestamp * 1000
+            ).toDateString()}`}
+          </span>
+          <button
+            disabled={isLoading}
+            onClick={deleteStream}
+            className="btn-error btn-sm btn w-full normal-case"
+          >
+            Unsubscribe
+          </button>
+        </div>
       )}
     </>
   );

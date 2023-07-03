@@ -6,6 +6,7 @@ import {
 import { type MetadataV2 } from "@lens-protocol/sdk-gated";
 import { Star } from "@phosphor-icons/react";
 import { ethers } from "ethers";
+import Image from "next/image";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -98,25 +99,26 @@ export function Publication({
         <div className="relative h-16 text-sm">
           <div className="absolute h-full w-full rounded-lg border border-primary text-sm blur-sm"></div>
           <div className="absolute z-10 flex w-full justify-between gap-4 p-5">
-            <div className="flex gap-4">
-              <div>🔒</div>
+            <div className="flex gap-2">
+              🔒
+              {unlockConditions.minFlowRate && (
+                <span>
+                  {`${unlockConditions.minFlowRate} ${SUPERFLUID_TOKEN} / mo.`}
+                </span>
+              )}
               {unlockConditions.maxTimestamp && (
-                <div>{`🕑 Since ${new Date(
+                <span>{`🕑 Since ${new Date(
                   Number.parseInt(unlockConditions.maxTimestamp) * 1000
-                ).toUTCString()}`}</div>
+                ).toUTCString()}`}</span>
               )}
             </div>
-            {unlockConditions.minFlowRate && (
-              <div>
-                {`🤑 ${unlockConditions.minFlowRate} ${SUPERFLUID_TOKEN} / mo.`}
-              </div>
-            )}
           </div>
         </div>
       ) : (
         <div className="rounded-lg border border-primary text-sm">
           {unlocked && (
-            <div className="flex w-full justify-end px-5 pt-3">
+            <div className="flex w-full items-center justify-end gap-1 px-5 pt-3 text-xs font-semibold">
+              <span>Premium</span>
               <Star
                 width={15}
                 height={15}
@@ -129,6 +131,20 @@ export function Publication({
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {metadata.content}
             </ReactMarkdown>
+            {metadata.media &&
+              metadata.media[0] &&
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              metadata.media[0].original.mimeType.includes("image/") && (
+                <Image
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  src={metadata.media[0].original.url}
+                  width={150}
+                  height={150}
+                  alt="Post image"
+                />
+              )}
           </div>
         </div>
       )}

@@ -214,7 +214,7 @@ export function CreatePost({
               autoComplete="off"
               type="text"
               size={3}
-              defaultValue={2}
+              defaultValue={5}
               name="minFlowRate"
               id="minFlowRate"
               className="input-bordered input-primary input input-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"

@@ -17,7 +17,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 // Polygon: 0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d
 // Mumbai: 0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 
-contract Mosaic {
+contract Premiere {
     function isSubscribed(
         address sender,
         address receiver,
@@ -42,7 +42,7 @@ contract Mosaic {
         uint256 _maxTimestamp = parseInt(maxTimestamp);
 
         if (
-            (flowRate > _minFlowRate &&
+            (flowRate >= _minFlowRate &&
                 (_maxTimestamp == 0 || timestamp < _maxTimestamp)) ||
             sender == _owner
         ) {

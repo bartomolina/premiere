@@ -28,7 +28,7 @@ export function ThemeChanger() {
         <Moon
           className="swap-off"
           size={25}
-          onClick={() => setTheme("dracula")}
+          onClick={() => setTheme("business")}
           alt="Dark Mode"
         />
       </label>

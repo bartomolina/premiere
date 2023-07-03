@@ -5,7 +5,7 @@ module.exports = {
     hoverOnlyWhenSupported: true,
   },
   daisyui: {
-    themes: ["lemonade", "dracula"],
+    themes: ["lemonade", "business"],
   },
   plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };
