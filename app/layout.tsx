@@ -17,8 +17,8 @@ declare global {
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "m0saic",
-  description: "m0saic",
+  title: "Premiere",
+  description: "Premiere",
 };
 
 export default function RootLayout({

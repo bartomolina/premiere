@@ -6,7 +6,6 @@ import {
 import { Framework, IStream } from "@superfluid-finance/sdk-core";
 import superTokenList from "@superfluid-finance/tokenlist";
 import SuperfluidWidget from "@superfluid-finance/widget";
-import { getWalletClient } from "@wagmi/core";
 import { providers } from "ethers";
 import { useTheme } from "next-themes";
 import { useMemo, useState } from "react";
@@ -25,6 +24,11 @@ import {
 } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
 import { wagmiNetwork } from "@/lib/wagmi-client";
+
+const provider = new providers.AlchemyProvider(
+  wagmiNetwork.id,
+  ALCHEMY_API_KEY
+);
 
 export function SubscriptionActions({
   tba,
@@ -46,40 +50,42 @@ export function SubscriptionActions({
   const { data: activeProfile } = useActiveProfile();
   const { theme } = useTheme();
 
-  const getSFContext = async () => {
-    const client = await getWalletClient();
+  const deleteStream = async () => {
+    setIsLoading(true);
 
     const sf = await Framework.create({
       chainId: wagmiNetwork.id,
-      provider: new providers.AlchemyProvider(wagmiNetwork.id, ALCHEMY_API_KEY),
+      provider,
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const superSigner = sf.createSigner({ client });
-    const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
+    if (window.ethereum) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await window.ethereum.enable();
+      const provider = new providers.Web3Provider(
+        window.ethereum as providers.ExternalProvider
+      );
 
-    return { superSigner, daix };
-  };
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const superSigner = sf.createSigner({ web3Provider: provider });
+      const daix = await sf.loadSuperToken(SUPERFLUID_TOKEN);
 
-  const deleteStream = async () => {
-    setIsLoading(true);
-    const sfContext = await getSFContext();
-    if (sfContext) {
-      const { superSigner, daix } = sfContext;
-      try {
-        const deleteFlowOperation = daix.deleteFlow({
-          sender: await superSigner.getAddress(),
-          receiver: tba,
-        });
+      if (superSigner && daix) {
+        try {
+          const deleteFlowOperation = daix.deleteFlow({
+            sender: await superSigner.getAddress(),
+            receiver: tba,
+          });
 
-        await deleteFlowOperation.exec(superSigner);
-        toast.success(
-          "Stream deleted. It may take a few minutes until it's reflected in the dashboard"
-        );
-      } catch (error) {
-        toast.error("Error deleting stream");
-        console.error(error);
+          await deleteFlowOperation.exec(superSigner);
+          toast.success(
+            "Unsubscribed. It may take a few minutes until it's reflected in the dashboard"
+          );
+        } catch (error) {
+          toast.error("Error cancelling the subscription");
+          console.error(error);
+        }
       }
     }
   };
@@ -124,7 +130,7 @@ export function SubscriptionActions({
                 },
                 chainId: wagmiNetwork.id,
                 flowRate: {
-                  amountEther: flowRate,
+                  amountEther: flowRate.length > 0 ? flowRate : "0",
                   period: "month",
                 },
               },
@@ -161,11 +167,16 @@ export function SubscriptionActions({
                 </label>
                 <input
                   type="text"
+                  autoComplete="off"
                   size={3}
                   value={flowRate}
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  onChange={(_event) => setFlowRate(_event.target.value)}
+                  onChange={(_event) => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    if (!Number.isNaN(_event.target.value)) {
+                      setFlowRate(_event.target.value as `${number}`);
+                    }
+                  }}
                   id="flowRate"
                   className="input-bordered input-primary input input-sm focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
                 />{" "}

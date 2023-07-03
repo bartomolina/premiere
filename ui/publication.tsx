@@ -5,6 +5,7 @@ import {
 } from "@lens-protocol/react-web";
 import { type MetadataV2 } from "@lens-protocol/sdk-gated";
 import { Star } from "@phosphor-icons/react";
+import { ethers } from "ethers";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -12,7 +13,7 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { APP_ID, ZERO_ADDRESS } from "@/lib/constants";
+import { APP_ID, SUPERFLUID_TOKEN, ZERO_ADDRESS } from "@/lib/constants";
 import { decrypt } from "@/lib/lit";
 
 export function Publication({
@@ -28,8 +29,10 @@ export function Publication({
     publication.metadata
   );
   const [unlocked, setUnlocked] = useState(false);
-
-  console.log(publication);
+  const [unlockConditions, setUnlockConditions] = useState({
+    minFlowRate: "",
+    maxTimestamp: "",
+  });
 
   useEffect(() => {
     if (sigReady) {
@@ -51,7 +54,13 @@ export function Publication({
           typeof minFlowRate === "string" &&
           typeof maxTimestamp === "string"
         ) {
-          console.log("checking...");
+          let monthlyFlowRate = Number(ethers.utils.formatEther(minFlowRate));
+          monthlyFlowRate = monthlyFlowRate * 60 * 60 * 24 * (365 / 12);
+
+          setUnlockConditions({
+            minFlowRate: monthlyFlowRate.toFixed(2),
+            maxTimestamp,
+          });
           try {
             const decryptedString = await decrypt(
               encryptedContent,
@@ -61,7 +70,6 @@ export function Publication({
               minFlowRate,
               maxTimestamp
             );
-
             const newMetadata = publication.metadata;
             omitDeep(newMetadata, "encryptionParams");
             newMetadata.content = decryptedString;
@@ -89,7 +97,21 @@ export function Publication({
       {publication.isGated && !unlocked ? (
         <div className="relative h-16 text-sm">
           <div className="absolute h-full w-full rounded-lg border border-primary text-sm blur-sm"></div>
-          <div className="absolute z-10 p-5 ">🔒 Subscribers only</div>
+          <div className="absolute z-10 flex w-full justify-between gap-4 p-5">
+            <div className="flex gap-4">
+              <div>🔒</div>
+              {unlockConditions.maxTimestamp && (
+                <div>{`🕑 Since ${new Date(
+                  Number.parseInt(unlockConditions.maxTimestamp) * 1000
+                ).toUTCString()}`}</div>
+              )}
+            </div>
+            {unlockConditions.minFlowRate && (
+              <div>
+                {`🤑 ${unlockConditions.minFlowRate} ${SUPERFLUID_TOKEN} / mo.`}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="rounded-lg border border-primary text-sm">
@@ -103,7 +125,7 @@ export function Publication({
               />
             </div>
           )}
-          <div className="prose-sm prose m-5 overflow-hidden text-ellipsis">
+          <div className="prose-sm prose m-5 break-words text-base-content">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {metadata.content}
             </ReactMarkdown>

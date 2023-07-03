@@ -53,13 +53,13 @@ export function CreatePost({
   const { mutate } = useApolloClient();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    const _minFlowRate = Math.round(
+    const _minFlowRate = Math.floor(
       Number(ethers.utils.parseEther(data.minFlowRate)._hex) /
-        (60 * 60 * 24 * 30)
+        (60 * 60 * 24 * (365 / 12))
     ).toString();
 
     const _maxTimestamp = data.maxTimestamp
-      ? Math.round(
+      ? Math.floor(
           new Date().setDate(new Date().getDate() - 7) / 1000
         ).toString()
       : "";
@@ -209,24 +209,21 @@ export function CreatePost({
       <div className="mt-2 flex items-center justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-2 font-medium">
-            <label htmlFor="minFlowRate" className="block">
-              Min.
-            </label>
             <input
               {...register("minFlowRate")}
+              autoComplete="off"
               type="text"
               size={3}
               defaultValue={2}
               name="minFlowRate"
               id="minFlowRate"
               className="input-bordered input-primary input input-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
-            />{" "}
-            {SUPERFLUID_TOKEN} / mo.
+            />
+            <label htmlFor="minFlowRate" className="block">
+              Min. {SUPERFLUID_TOKEN} / mo.
+            </label>
           </div>
           <div className="flex items-center gap-2 font-medium">
-            <label htmlFor="maxTimestamp" className="block">
-              &ge; 1 week
-            </label>
             <input
               {...register("maxTimestamp")}
               type="checkbox"
@@ -236,6 +233,9 @@ export function CreatePost({
               id="maxTimestamp"
               className="checkbox-primary checkbox checkbox-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
             />
+            <label htmlFor="maxTimestamp" className="block">
+              Subscribed for &ge; 1 week
+            </label>
           </div>
         </div>
         <div className="ml-4">

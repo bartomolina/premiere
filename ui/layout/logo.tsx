@@ -5,16 +5,16 @@ export function Logo() {
   return (
     <Link href={"/"}>
       <Image
-        src={"/logo.svg"}
-        alt="m0saic"
-        className="hidden md:block"
+        src={"/premiere_logo.png"}
+        alt="Premiere"
+        className="hidden p-3 md:block"
         priority
-        width={200}
-        height={200}
+        width={150}
+        height={150}
       />
       <Image
-        src={"/logo_small.png"}
-        alt="m0saic"
+        src={"/premiere_logo_small.png"}
+        alt="Premiere"
         className="hidden sm:block md:hidden"
         priority
         width={75}

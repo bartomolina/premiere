@@ -2,6 +2,8 @@ import { type Profile } from "@lens-protocol/react-web";
 import { ArrowSquareOut } from "@phosphor-icons/react";
 import { IStream } from "@superfluid-finance/sdk-core";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { LENSTER_URL } from "@/lib/constants";
 import { getAvatar } from "@/lib/get-avatar";
@@ -69,7 +71,11 @@ export function ProfileDetails({
             </a>
           </div>
         </div>
-        <div className="mt-2 text-xs">{profile.bio}</div>
+        <div className="prose mt-2 break-words text-xs">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {profile.bio ?? ""}
+          </ReactMarkdown>
+        </div>
         <TbaDetails
           profile={profile}
           tba={tba}

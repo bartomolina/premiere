@@ -91,7 +91,7 @@ export function LensLogin() {
           </label>
           <ul
             tabIndex={0}
-            className="dropdown-content menu rounded-box z-10 w-52 bg-base-100 p-2 shadow"
+            className="dropdown-content menu rounded-box z-20 w-52 bg-base-100 p-2 shadow"
           >
             <LensProfiles />
             <li>

@@ -11,7 +11,7 @@ import { NavItem } from "./nav-item";
 export function TopNavigation() {
   return (
     <div className="flex h-24 md:grid md:grid-cols-5 md:gap-7">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <label
           htmlFor="drawer"
           className="btn-ghost drawer-button btn-square btn hidden"
@@ -45,7 +45,7 @@ export function TopNavigation() {
           <TwitterLogo size={25} alt="Twitter" />
         </a>
         <a
-          href="https://github.com/bartomolina/m0saic"
+          href="https://github.com/bartomolina/premiere"
           target="_blank"
           rel="noopener noreferrer"
         >

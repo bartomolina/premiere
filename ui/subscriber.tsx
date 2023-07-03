@@ -20,7 +20,7 @@ export function Subscriber({ subscription }: { subscription: IStream }) {
     60 *
     60 *
     24 *
-    30;
+    (365 / 12);
 
   if (!sender || sender.length === 0) {
     // eslint-disable-next-line unicorn/no-null

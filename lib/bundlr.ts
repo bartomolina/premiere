@@ -13,12 +13,10 @@ export const upload = async (data: any) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     await window.ethereum.enable();
-    console.log(window.ethereum);
     const provider = new providers.Web3Provider(
       window.ethereum as providers.ExternalProvider
     );
     const signer = provider.getSigner();
-    console.log("Signer:", signer);
 
     // create a WebBundlr object
     const bundlrNode =
