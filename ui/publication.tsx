@@ -15,6 +15,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { APP_ID, SUPERFLUID_TOKEN, ZERO_ADDRESS } from "@/lib/constants";
+import { imageKit, sanitizeDStorageUrl } from "@/lib/get-avatar";
 import { decrypt } from "@/lib/lit";
 
 export function Publication({
@@ -36,32 +37,32 @@ export function Publication({
   });
 
   useEffect(() => {
-    if (sigReady) {
-      const decryptPublication = async () => {
-        const encryptedContent =
-          publication.metadata.encryptionParams?.encryptedFields?.content;
-        const encryptedSymmetricKey =
-          publication.metadata.encryptionParams?.providerSpecificParams
-            ?.encryptionKey;
-        const minFlowRate = publication.metadata.attributes.find(
-          (attribute) => attribute.traitType === "minFlowRate"
-        )?.value;
-        const maxTimestamp = publication.metadata.attributes.find(
-          (attribute) => attribute.traitType === "maxTimestamp"
-        )?.value;
-        if (
-          encryptedContent &&
-          encryptedSymmetricKey &&
-          typeof minFlowRate === "string" &&
-          typeof maxTimestamp === "string"
-        ) {
-          let monthlyFlowRate = Number(ethers.utils.formatEther(minFlowRate));
-          monthlyFlowRate = monthlyFlowRate * 60 * 60 * 24 * (365 / 12);
+    const decryptPublication = async () => {
+      const encryptedContent =
+        publication.metadata.encryptionParams?.encryptedFields?.content;
+      const encryptedSymmetricKey =
+        publication.metadata.encryptionParams?.providerSpecificParams
+          ?.encryptionKey;
+      const minFlowRate = publication.metadata.attributes.find(
+        (attribute) => attribute.traitType === "minFlowRate"
+      )?.value;
+      const maxTimestamp = publication.metadata.attributes.find(
+        (attribute) => attribute.traitType === "maxTimestamp"
+      )?.value;
+      if (
+        encryptedContent &&
+        encryptedSymmetricKey &&
+        typeof minFlowRate === "string" &&
+        typeof maxTimestamp === "string"
+      ) {
+        let monthlyFlowRate = Number(ethers.utils.formatEther(minFlowRate));
+        monthlyFlowRate = monthlyFlowRate * 60 * 60 * 24 * (365 / 12);
 
-          setUnlockConditions({
-            minFlowRate: monthlyFlowRate.toFixed(2),
-            maxTimestamp,
-          });
+        setUnlockConditions({
+          minFlowRate: monthlyFlowRate.toFixed(2),
+          maxTimestamp,
+        });
+        if (sigReady) {
           try {
             const decryptedString = await decrypt(
               encryptedContent,
@@ -80,16 +81,17 @@ export function Publication({
             console.log("You don't have access to the publication");
           }
         }
-      };
-      if (
-        publication?.isGated &&
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        publication.appId === appId(APP_ID) &&
-        tba != ZERO_ADDRESS
-      ) {
-        decryptPublication();
       }
+    };
+
+    if (
+      publication?.isGated &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      publication.appId === appId(APP_ID) &&
+      tba != ZERO_ADDRESS
+    ) {
+      decryptPublication();
     }
   }, [publication, tba, sigReady]);
 
@@ -136,14 +138,19 @@ export function Publication({
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               metadata.media[0].original.mimeType.includes("image/") && (
-                <Image
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  src={metadata.media[0].original.url}
-                  width={150}
-                  height={150}
-                  alt="Post image"
-                />
+                <div>
+                  <Image
+                    src={imageKit(
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      sanitizeDStorageUrl(metadata.media[0].original.url)
+                    )}
+                    width={150}
+                    height={150}
+                    alt="Post image"
+                    className="mx-auto"
+                  />
+                </div>
               )}
           </div>
         </div>

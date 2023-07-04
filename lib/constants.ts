@@ -1,7 +1,7 @@
 import { Network } from "alchemy-sdk";
 import { polygon, polygonMumbai } from "viem/chains";
 
-export const IPFS_GATEWAY = "https://gateway.ipfscdn.io/ipfs/";
+export const IPFS_GATEWAY = "https://ipfs.io/ipfs/";
 export const ARWEAVE_GATEWAY = "https://arweave.net/";
 export const AVATAR = "tr:w-300,h-300";
 export const LENS_MEDIA_SNAPSHOT_URL =
@@ -41,11 +41,11 @@ export const SUPERFLUID_STREAM_URL =
     ? "https://console.superfluid.finance/matic/streams/"
     : "https://console.superfluid.finance/mumbai/streams/";
 export const CHAIN = LENS_NETWORK === "mainnet" ? "polygon" : "mumbai";
-export const MOSAIC_LIT_ACC_CONTRACT =
+export const PREMIERE_LIT_ACC_CONTRACT =
   LENS_NETWORK === "mainnet"
-    ? ""
+    ? "0x207305e4249360ed90D3317FA61fC34809FD4367"
     : "0xe1BEb28d045e7c9FEe3362792857bB22022fBb20";
-export const APP_ID = "mosaic";
+export const APP_ID = "premiere";
 export const LIGHT_THEME_PRIMARY = "#529b03";
 export const LIGHT_THEME_SECONDARY = "#e9e92f";
 export const DARK_THEME_PRIMARY = "#1c4f82";

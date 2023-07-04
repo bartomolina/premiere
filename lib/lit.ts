@@ -1,6 +1,6 @@
 import * as LitJsSdk from "@lit-protocol/lit-node-client";
 
-import { CHAIN, MOSAIC_LIT_ACC_CONTRACT } from "./constants";
+import { CHAIN, PREMIERE_LIT_ACC_CONTRACT } from "./constants";
 
 const conditions = (
   address: string,
@@ -9,7 +9,7 @@ const conditions = (
   maxTimestamp: string
 ) => [
   {
-    contractAddress: MOSAIC_LIT_ACC_CONTRACT,
+    contractAddress: PREMIERE_LIT_ACC_CONTRACT,
     functionName: "isSubscribed",
     functionParams: [
       ":userAddress",

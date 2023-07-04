@@ -13,7 +13,7 @@ const getStampFyiURL = (address: string): string => {
   return `https://cdn.stamp.fyi/avatar/eth:${lowerCaseAddress}?s=300`;
 };
 
-const sanitizeDStorageUrl = (hash?: string): string => {
+export const sanitizeDStorageUrl = (hash?: string): string => {
   if (!hash) {
     return "";
   }
@@ -27,7 +27,7 @@ const sanitizeDStorageUrl = (hash?: string): string => {
   return link;
 };
 
-const imageKit = (url: string, name?: string): string => {
+export const imageKit = (url: string, name?: string): string => {
   if (!url) {
     return "";
   }

@@ -165,6 +165,7 @@ export function SubscriptionActions({
                 <label htmlFor="flowRate" className="hidden">
                   Flow rate
                 </label>
+                Add
                 <input
                   type="text"
                   autoComplete="off"
@@ -184,8 +185,8 @@ export function SubscriptionActions({
                   }}
                   id="flowRate"
                   className="input-bordered input-primary input input-sm focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
-                />{" "}
-                {SUPERFLUID_TOKEN} / mo.
+                />
+                {`${SUPERFLUID_TOKEN} / mo.`}
               </div>
               <div>
                 <button
