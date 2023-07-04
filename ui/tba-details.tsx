@@ -36,12 +36,23 @@ export function TbaDetails({
           target="_blank"
           rel="noreferrer noopener"
         >
-          <Image
-            alt="Tokenbound"
-            src={theme === "light" ? "/tb-mark.svg" : "/tb-mark-dark.svg"}
-            width={30}
-            height={30}
-          />
+          {theme === "light" ? (
+            <Image
+              key={"light"}
+              alt="Tokenbound"
+              src={"/tb-mark.svg"}
+              width={30}
+              height={30}
+            />
+          ) : (
+            <Image
+              key={"dark"}
+              alt="Tokenbound"
+              src={"/tb-mark-dark.svg"}
+              width={30}
+              height={30}
+            />
+          )}
           <span className="font-semibold">ERC-6551 TBA</span>
         </a>
       </div>

@@ -38,17 +38,25 @@ export function Protocols() {
             target="_blank"
             rel="noreferrer noopener"
           >
-            <Image
-              src={
-                theme === "light"
-                  ? "/superfluid-logo.png"
-                  : "/superfluid-logo-dark.png"
-              }
-              alt="Superfluid protocol"
-              fill
-              sizes="100vw"
-              style={{ objectFit: "scale-down" }}
-            />
+            {theme === "light" ? (
+              <Image
+                key={"light"}
+                src={"/superfluid-logo.png"}
+                alt="Superfluid protocol"
+                fill
+                sizes="100vw"
+                style={{ objectFit: "scale-down" }}
+              />
+            ) : (
+              <Image
+                key={"dark"}
+                src={"/superfluid-logo-dark.png"}
+                alt="Superfluid protocol"
+                fill
+                sizes="100vw"
+                style={{ objectFit: "scale-down" }}
+              />
+            )}
           </a>
         </div>
         <div>
@@ -70,12 +78,23 @@ export function Protocols() {
             target="_blank"
             rel="noreferrer noopener"
           >
-            <Image
-              src={theme === "light" ? "/tb-mark.svg" : "/tb-mark-dark.svg"}
-              alt="Tokenbound"
-              fill
-              sizes="100vw"
-            />
+            {theme === "light" ? (
+              <Image
+                key={"light"}
+                src={"/tb-mark.svg"}
+                alt="Superfluid protocol"
+                fill
+                sizes="100vw"
+              />
+            ) : (
+              <Image
+                key={"dark"}
+                src={"/tb-mark-dark.svg"}
+                alt="Superfluid protocol"
+                fill
+                sizes="100vw"
+              />
+            )}
           </a>
         </div>
         <div>
