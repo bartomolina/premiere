@@ -52,3 +52,4 @@ export const DARK_THEME_PRIMARY = "#1c4f82";
 export const DARK_THEME_SECONDARY = "#7d919b";
 export const WALLET_NETWORK =
   LENS_NETWORK === "mainnet" ? polygon : polygonMumbai;
+export const DARK_THEME = "business";

@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { ToastContainer } from "react-toastify";
 import { WagmiConfig } from "wagmi";
 
+import { DARK_THEME } from "@/lib/constants";
 import { lensConfig } from "@/lib/lens-config";
 import { wagmiConfig } from "@/lib/wagmi-client";
 import { SideNav } from "@/ui/layout/side-navigation";
@@ -32,7 +33,7 @@ export function Client({ children }: { children: React.ReactNode }) {
           <SideNav />
         </div>
       </div>
-      <ToastContainer theme={theme === "light" ? "light" : "dark"} />
+      <ToastContainer theme={theme === DARK_THEME ? "dark" : "light"} />
     </div>
   );
 }

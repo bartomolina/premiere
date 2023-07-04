@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 
 import {
+  DARK_THEME,
   LENS_HUB_ADDRESS,
   OPENSEA_URL,
   POLYGONSCAN_URL,
@@ -36,23 +37,12 @@ export function TbaDetails({
           target="_blank"
           rel="noreferrer noopener"
         >
-          {theme === "light" ? (
-            <Image
-              key={"light"}
-              alt="Tokenbound"
-              src={"/tb-mark.svg"}
-              width={30}
-              height={30}
-            />
-          ) : (
-            <Image
-              key={"dark"}
-              alt="Tokenbound"
-              src={"/tb-mark-dark.svg"}
-              width={30}
-              height={30}
-            />
-          )}
+          <Image
+            alt="Tokenbound"
+            src={theme === DARK_THEME ? "/tb-mark-dark.svg" : "/tb-mark.svg"}
+            width={30}
+            height={30}
+          />
           <span className="font-semibold">ERC-6551 TBA</span>
         </a>
       </div>

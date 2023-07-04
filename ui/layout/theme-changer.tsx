@@ -2,6 +2,8 @@ import { Moon, Sun } from "@phosphor-icons/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { DARK_THEME } from "@/lib/constants";
+
 export function ThemeChanger() {
   const [mounted, setMounted] = useState(false);
   const { setTheme } = useTheme();
@@ -28,7 +30,7 @@ export function ThemeChanger() {
         <Moon
           className="swap-off"
           size={25}
-          onClick={() => setTheme("business")}
+          onClick={() => setTheme(DARK_THEME)}
           alt="Dark Mode"
         />
       </label>

@@ -1,8 +1,11 @@
 import Image from "next/image";
 import { useTheme } from "next-themes";
 
+import { DARK_THEME } from "@/lib/constants";
+
 export function Protocols() {
   const { theme } = useTheme();
+
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       <div>
@@ -38,25 +41,17 @@ export function Protocols() {
             target="_blank"
             rel="noreferrer noopener"
           >
-            {theme === "light" ? (
-              <Image
-                key={"light"}
-                src={"/superfluid-logo.png"}
-                alt="Superfluid protocol"
-                fill
-                sizes="100vw"
-                style={{ objectFit: "scale-down" }}
-              />
-            ) : (
-              <Image
-                key={"dark"}
-                src={"/superfluid-logo-dark.png"}
-                alt="Superfluid protocol"
-                fill
-                sizes="100vw"
-                style={{ objectFit: "scale-down" }}
-              />
-            )}
+            <Image
+              src={
+                theme === DARK_THEME
+                  ? "/superfluid-logo-dark.png"
+                  : "/superfluid-logo.png"
+              }
+              alt="Superfluid protocol"
+              fill
+              sizes="100vw"
+              style={{ objectFit: "scale-down" }}
+            />
           </a>
         </div>
         <div>
@@ -78,23 +73,12 @@ export function Protocols() {
             target="_blank"
             rel="noreferrer noopener"
           >
-            {theme === "light" ? (
-              <Image
-                key={"light"}
-                src={"/tb-mark.svg"}
-                alt="Superfluid protocol"
-                fill
-                sizes="100vw"
-              />
-            ) : (
-              <Image
-                key={"dark"}
-                src={"/tb-mark-dark.svg"}
-                alt="Superfluid protocol"
-                fill
-                sizes="100vw"
-              />
-            )}
+            <Image
+              src={theme === DARK_THEME ? "/tb-mark-dark.svg" : "/tb-mark.svg"}
+              alt="Superfluid protocol"
+              fill
+              sizes="100vw"
+            />
           </a>
         </div>
         <div>

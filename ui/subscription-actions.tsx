@@ -15,6 +15,7 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 
 import {
   ALCHEMY_API_KEY,
+  DARK_THEME,
   DARK_THEME_PRIMARY,
   DARK_THEME_SECONDARY,
   LIGHT_THEME_PRIMARY,
@@ -140,16 +141,18 @@ export function SubscriptionActions({
           type="drawer"
           theme={{
             palette: {
-              mode: theme === "light" ? "light" : "dark",
+              mode: theme === DARK_THEME ? "dark" : "light",
               primary: {
                 main:
-                  theme === "light" ? LIGHT_THEME_PRIMARY : DARK_THEME_PRIMARY,
+                  theme === DARK_THEME
+                    ? DARK_THEME_PRIMARY
+                    : LIGHT_THEME_PRIMARY,
               },
               secondary: {
                 main:
-                  theme === "light"
-                    ? LIGHT_THEME_SECONDARY
-                    : DARK_THEME_SECONDARY,
+                  theme === DARK_THEME
+                    ? DARK_THEME_SECONDARY
+                    : LIGHT_THEME_SECONDARY,
               },
             },
           }}
