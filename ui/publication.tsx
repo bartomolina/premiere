@@ -109,7 +109,7 @@ export function Publication({
                 </span>
               )}
               {unlockConditions.maxTimestamp && (
-                <span>{`🕑 Since ${new Date(
+                <span>{`🕑 Before ${new Date(
                   Number.parseInt(unlockConditions.maxTimestamp) * 1000
                 ).toUTCString()}`}</span>
               )}

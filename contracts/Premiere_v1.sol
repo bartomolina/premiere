@@ -18,6 +18,13 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 // Mumbai: 0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 
 contract Premiere {
+    IConstantFlowAgreementV1 private cfa =
+        IConstantFlowAgreementV1(0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873);
+    ISuperfluidToken private superToken =
+        ISuperfluidToken(0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f);
+    IERC721 private lensHub =
+        IERC721(0x60Ae865ee4C725cd04353b5AAb364553f56ceF82);
+
     function isSubscribed(
         address sender,
         address receiver,
@@ -27,16 +34,12 @@ contract Premiere {
     ) public view returns (bool subscribed) {
         subscribed = false;
 
-        IERC721 _lensHub = IERC721(0x60Ae865ee4C725cd04353b5AAb364553f56ceF82);
-        IConstantFlowAgreementV1 _cfa = IConstantFlowAgreementV1(
-            0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873
-        );
-        (uint256 timestamp, int96 flowRate, , ) = _cfa.getFlow(
-            ISuperfluidToken(0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f),
+        (uint256 timestamp, int96 flowRate, , ) = cfa.getFlow(
+            superToken,
             sender,
             receiver
         );
-        address _owner = _lensHub.ownerOf(uint(parseInt(profileId)));
+        address owner = lensHub.ownerOf(uint(parseInt(profileId)));
 
         int256 _minFlowRate = int(parseInt(minFlowRate));
         uint256 _maxTimestamp = parseInt(maxTimestamp);
@@ -44,7 +47,7 @@ contract Premiere {
         if (
             (flowRate >= _minFlowRate &&
                 (_maxTimestamp == 0 || timestamp < _maxTimestamp)) ||
-            sender == _owner
+            sender == owner
         ) {
             subscribed = true;
         }

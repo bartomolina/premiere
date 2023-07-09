@@ -168,7 +168,7 @@ export function SubscriptionActions({
                 <label htmlFor="flowRate" className="hidden">
                   Flow rate
                 </label>
-                Add
+                {ownSubscription && "Add"}
                 <input
                   type="text"
                   autoComplete="off"
