@@ -20,6 +20,7 @@ import {
   DARK_THEME_SECONDARY,
   LIGHT_THEME_PRIMARY,
   LIGHT_THEME_SECONDARY,
+  MIN_FLOWRATE,
   SUPERFLUID_TOKEN,
   SUPERFLUID_TOKEN_ADDRESS,
 } from "@/lib/constants";
@@ -41,7 +42,7 @@ export function SubscriptionActions({
   subscriptions: IStream[];
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [flowRate, setFlowRate] = useState<`${number}`>("5");
+  const [flowRate, setFlowRate] = useState<`${number}`>(MIN_FLOWRATE);
   const { data: wallet } = useActiveWallet();
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect({

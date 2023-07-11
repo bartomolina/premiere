@@ -4,9 +4,16 @@ import {
   type ProfileOwnedByMe,
   useApolloClient,
 } from "@lens-protocol/react-web";
-import { MetadataV2, PublicationMainFocus } from "@lens-protocol/sdk-gated";
+import {
+  ContractType,
+  LensEnvironment,
+  LensGatedSDK,
+  MetadataV2,
+  NftOwnership,
+  PublicationMainFocus,
+} from "@lens-protocol/sdk-gated";
 import { signTypedData, waitForTransaction, writeContract } from "@wagmi/core";
-import { ethers, utils } from "ethers";
+import { ethers, providers, utils } from "ethers";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import omitDeep from "omit-deep";
@@ -21,22 +28,25 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { lensHubAbi } from "@/lib/abi/lens-hub-contract-abi";
 import { createPostQuery } from "@/lib/api";
 import { upload } from "@/lib/bundlr";
-import { APP_ID, LENS_HUB_ADDRESS, SUPERFLUID_TOKEN } from "@/lib/constants";
-import { encrypt } from "@/lib/lit";
+import {
+  APP_ID,
+  LENS_HUB_ADDRESS,
+  LENS_NETWORK,
+  MIN_FLOWRATE,
+  PREMIERE_LIT_ACC_CONTRACT,
+} from "@/lib/constants";
+import { wagmiNetwork } from "@/lib/wagmi-client";
 
 interface IFormInput {
   post: string;
   minFlowRate: string;
-  maxTimestamp: string;
 }
 
 export function CreatePost({
   publisher,
-  tba,
   fetchPublications,
 }: {
   publisher: ProfileOwnedByMe;
-  tba: `0x${string}`;
   fetchPublications: () => void;
 }) {
   const {
@@ -54,28 +64,14 @@ export function CreatePost({
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     const _minFlowRate = Math.floor(
-      Number(ethers.utils.parseEther(data.minFlowRate)._hex) /
+      Number(ethers.utils.parseEther(MIN_FLOWRATE)._hex) /
         (60 * 60 * 24 * (365 / 12))
     ).toString();
-
-    const _maxTimestamp = data.maxTimestamp
-      ? Math.floor(
-          new Date().setDate(new Date().getDate() - 7) / 1000
-        ).toString()
-      : "";
-
-    const { encryptedString, encryptedSymmetricKey } = await encrypt(
-      data.post,
-      tba,
-      Number.parseInt(publisher.id, 16).toString(),
-      _minFlowRate,
-      _maxTimestamp
-    );
 
     const postData: MetadataV2 = {
       version: "2.0.0",
       metadata_id: uuidv4(),
-      content: "This publication is gated.",
+      content: data.post,
       locale: "en",
       mainContentFocus: PublicationMainFocus.TextOnly,
       description: "This publication is gated.",
@@ -88,42 +84,8 @@ export function CreatePost({
           value: _minFlowRate,
           traitType: "minFlowRate",
         },
-        {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          displayType: "string",
-          value: _maxTimestamp,
-          traitType: "maxTimestamp",
-        },
       ],
       appId: appId(APP_ID),
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      encryptionParams: {
-        encryptedFields: {
-          content: encryptedString,
-        },
-        providerSpecificParams: {
-          encryptionKey: encryptedSymmetricKey,
-        },
-        encryptionProvider: "LIT_PROTOCOL",
-        accessCondition: {
-          or: {
-            criteria: [
-              {
-                profile: {
-                  profileId: publisher.id,
-                },
-              },
-              {
-                profile: {
-                  profileId: publisher.id,
-                },
-              },
-            ],
-          },
-        },
-      },
     };
 
     if (isConnected) {
@@ -134,9 +96,47 @@ export function CreatePost({
     } catch (error) {
       toast.error("Error connecting to wallet");
       console.error(error);
+      return;
     }
 
-    const contentURI = await upload(postData);
+    const provider = new providers.Web3Provider(
+      window.ethereum as providers.ExternalProvider
+    );
+
+    const signer = provider.getSigner();
+
+    const nftAccessCondition: NftOwnership = {
+      contractAddress: PREMIERE_LIT_ACC_CONTRACT,
+      chainID: wagmiNetwork.id,
+      contractType: ContractType.Erc1155,
+      tokenIds: [Number.parseInt(publisher.id, 16).toString()],
+    };
+
+    const sdk = await LensGatedSDK.create({
+      provider,
+      signer,
+      env:
+        LENS_NETWORK === "mainnet"
+          ? LensEnvironment.Polygon
+          : LensEnvironment.Mumbai,
+    });
+
+    await sdk.connect({
+      address: await signer.getAddress(),
+      env:
+        LENS_NETWORK === "mainnet"
+          ? LensEnvironment.Polygon
+          : LensEnvironment.Mumbai,
+    });
+
+    const { contentURI } = await sdk.gated.encryptMetadata(
+      postData,
+      publisher.id,
+      {
+        nft: nftAccessCondition,
+      },
+      upload
+    );
 
     const typedResult = await mutate({
       mutation: gql(createPostQuery),
@@ -154,6 +154,7 @@ export function CreatePost({
       types: omitDeep(typedData.types, "__typename"),
       message: omitDeep(typedData.value, "__typename"),
     });
+
     const { v, r, s } = utils.splitSignature(signature) as {
       v: number;
       r: `0x${string}`;
@@ -206,38 +207,7 @@ export function CreatePost({
           className="textarea-bordered textarea-primary textarea textarea-md w-full focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
         />
       </div>
-      <div className="mt-2 flex items-center justify-between">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 font-medium">
-            <input
-              {...register("minFlowRate")}
-              autoComplete="off"
-              type="text"
-              size={3}
-              defaultValue={5}
-              name="minFlowRate"
-              id="minFlowRate"
-              className="input-bordered input-primary input input-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
-            />
-            <label htmlFor="minFlowRate" className="block">
-              Min. {SUPERFLUID_TOKEN} / mo.
-            </label>
-          </div>
-          <div className="flex items-center gap-2 font-medium">
-            <input
-              {...register("maxTimestamp")}
-              type="checkbox"
-              size={4}
-              defaultChecked={false}
-              name="maxTimestamp"
-              id="maxTimestamp"
-              className="checkbox-primary checkbox checkbox-xs focus:outline-0 focus:ring-1 focus:ring-inset focus:ring-primary"
-            />
-            <label htmlFor="maxTimestamp" className="block">
-              Subscribed for &ge; 1 week
-            </label>
-          </div>
-        </div>
+      <div className="mt-2 flex items-center justify-end">
         <div className="ml-4">
           <button
             disabled={!isValid || isSubmitting}

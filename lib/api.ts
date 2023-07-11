@@ -43,7 +43,7 @@ mutation CreatePostTypedData($profileId: ProfileId!, $url: Url!) {
 `;
 
 export const getPublicationsQuery = `
-query Publications($profileId: ProfileId!) {
+query Publications($profileId: ProfileId!, $observer: EthereumAddress!) {
   publications(request: {
     profileId: $profileId,
     publicationTypes: [POST],
@@ -192,6 +192,11 @@ fragment PostFields on Post {
   appId
   hidden
   isGated
+  canDecrypt(address: $observer) {
+    result
+    reasons
+    extraDetails
+  }
   reaction(request: null)
   mirrors(by: null)
   hasCollectedByMe

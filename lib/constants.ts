@@ -43,8 +43,8 @@ export const SUPERFLUID_STREAM_URL =
 export const CHAIN = LENS_NETWORK === "mainnet" ? "polygon" : "mumbai";
 export const PREMIERE_LIT_ACC_CONTRACT =
   LENS_NETWORK === "mainnet"
-    ? "0x207305e4249360ed90D3317FA61fC34809FD4367"
-    : "0xe1BEb28d045e7c9FEe3362792857bB22022fBb20";
+    ? ""
+    : "0x9865a93FB56bfC01765C003F093990Cb3d88b445";
 export const APP_ID = "premiere";
 export const LIGHT_THEME_PRIMARY = "#529b03";
 export const LIGHT_THEME_SECONDARY = "#e9e92f";
@@ -53,3 +53,4 @@ export const DARK_THEME_SECONDARY = "#7d919b";
 export const WALLET_NETWORK =
   LENS_NETWORK === "mainnet" ? polygon : polygonMumbai;
 export const DARK_THEME = "business";
+export const MIN_FLOWRATE = "5";

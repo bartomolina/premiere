@@ -3,84 +3,90 @@ import {
   type MetadataOutput,
   type Post,
 } from "@lens-protocol/react-web";
-import { type MetadataV2 } from "@lens-protocol/sdk-gated";
+import {
+  LensEnvironment,
+  LensGatedSDK,
+  type MetadataV2,
+} from "@lens-protocol/sdk-gated";
 import { Star } from "@phosphor-icons/react";
-import { ethers } from "ethers";
+import { providers } from "ethers";
 import Image from "next/image";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import omitDeep from "omit-deep";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { toast } from "react-toastify";
 import remarkGfm from "remark-gfm";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
-import { APP_ID, SUPERFLUID_TOKEN, ZERO_ADDRESS } from "@/lib/constants";
+import {
+  APP_ID,
+  LENS_NETWORK,
+  MIN_FLOWRATE,
+  SUPERFLUID_TOKEN,
+  ZERO_ADDRESS,
+} from "@/lib/constants";
 import { imageKit, sanitizeDStorageUrl } from "@/lib/get-avatar";
-import { decrypt } from "@/lib/lit";
 
 export function Publication({
   publication,
   tba,
-  sigReady,
 }: {
   publication: Post;
   tba: `0x${string}`;
-  sigReady: boolean;
 }) {
   const [metadata, setMetadata] = useState<MetadataOutput | MetadataV2>(
     publication.metadata
   );
   const [unlocked, setUnlocked] = useState(false);
-  const [unlockConditions, setUnlockConditions] = useState({
-    minFlowRate: "",
-    maxTimestamp: "",
+  const { isConnected } = useAccount();
+  const { disconnectAsync } = useDisconnect();
+  const { connectAsync } = useConnect({
+    connector: new InjectedConnector(),
   });
 
   useEffect(() => {
     const decryptPublication = async () => {
-      const encryptedContent =
-        publication.metadata.encryptionParams?.encryptedFields?.content;
-      const encryptedSymmetricKey =
-        publication.metadata.encryptionParams?.providerSpecificParams
-          ?.encryptionKey;
-      const minFlowRate = publication.metadata.attributes.find(
-        (attribute) => attribute.traitType === "minFlowRate"
-      )?.value;
-      const maxTimestamp = publication.metadata.attributes.find(
-        (attribute) => attribute.traitType === "maxTimestamp"
-      )?.value;
-      if (
-        encryptedContent &&
-        encryptedSymmetricKey &&
-        typeof minFlowRate === "string" &&
-        typeof maxTimestamp === "string"
-      ) {
-        let monthlyFlowRate = Number(ethers.utils.formatEther(minFlowRate));
-        monthlyFlowRate = monthlyFlowRate * 60 * 60 * 24 * (365 / 12);
+      if (isConnected) {
+        await disconnectAsync();
+      }
+      try {
+        await connectAsync();
+      } catch (error) {
+        toast.error("Error connecting to wallet");
+        console.error(error);
+        return;
+      }
 
-        setUnlockConditions({
-          minFlowRate: monthlyFlowRate.toFixed(2),
-          maxTimestamp,
-        });
-        if (sigReady) {
-          try {
-            const decryptedString = await decrypt(
-              encryptedContent,
-              encryptedSymmetricKey,
-              tba,
-              Number.parseInt(publication.profile.id, 16).toString(),
-              minFlowRate,
-              maxTimestamp
-            );
-            const newMetadata = publication.metadata;
-            omitDeep(newMetadata, "encryptionParams");
-            newMetadata.content = decryptedString;
-            setMetadata(newMetadata);
-            setUnlocked(true);
-          } catch {
-            console.log("You don't have access to the publication");
-          }
-        }
+      const provider = new providers.Web3Provider(
+        window.ethereum as providers.ExternalProvider
+      );
+
+      const signer = provider.getSigner();
+
+      const sdk = await LensGatedSDK.create({
+        provider,
+        signer,
+        env:
+          LENS_NETWORK === "mainnet"
+            ? LensEnvironment.Polygon
+            : LensEnvironment.Mumbai,
+      });
+
+      await sdk.connect({
+        address: await signer.getAddress(),
+        env:
+          LENS_NETWORK === "mainnet"
+            ? LensEnvironment.Polygon
+            : LensEnvironment.Mumbai,
+      });
+
+      const { decrypted } = await sdk.gated.decryptMetadata(
+        publication.metadata
+      );
+
+      if (decrypted) {
+        setMetadata(decrypted);
+        setUnlocked(true);
       }
     };
 
@@ -88,12 +94,17 @@ export function Publication({
       publication?.isGated &&
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
+      publication.canDecrypt?.result &&
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       publication.appId === appId(APP_ID) &&
       tba != ZERO_ADDRESS
     ) {
       decryptPublication();
     }
-  }, [publication, tba, sigReady]);
+  }, [publication, tba]);
+
+  console.log(publication);
 
   return (
     <>
@@ -103,16 +114,7 @@ export function Publication({
           <div className="absolute z-10 flex w-full justify-between gap-4 p-5">
             <div className="flex gap-2">
               🔒
-              {unlockConditions.minFlowRate && (
-                <span>
-                  {`${unlockConditions.minFlowRate} ${SUPERFLUID_TOKEN} / mo.`}
-                </span>
-              )}
-              {unlockConditions.maxTimestamp && (
-                <span>{`🕑 Before ${new Date(
-                  Number.parseInt(unlockConditions.maxTimestamp) * 1000
-                ).toUTCString()}`}</span>
-              )}
+              <span>{`${MIN_FLOWRATE} ${SUPERFLUID_TOKEN} / mo.`}</span>
             </div>
           </div>
         </div>
